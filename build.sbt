@@ -7,12 +7,13 @@ version := "2.4.4"
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.4.4"
+  "com.typesafe.akka" %% "akka-actor" % "2.4.4",
+  "com.typesafe.akka" %% "akka-remote" % "2.4.4"
 )
 
 enablePlugins(JavaServerAppPackaging)
 
-mainClass in Compile := Some("sample.hello.Main2")
+mainClass in Compile := Some("dist_casso.GraphProcessor")
 
 mappings in Universal ++= {
   // optional example illustrating how to copy additional directory
