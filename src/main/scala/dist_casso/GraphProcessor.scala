@@ -11,10 +11,10 @@ object GraphProcessor extends App {
 
     // Set correct results handler (depending on selected algorithm)
     val listener = system.actorOf(Props[Listener], name = "listener")
+    val logger = system.actorOf(Props[Logger], name = "logger")
 
     // Set up master and run selected algorithm
-    val master = system.actorOf(Props(new Master(listener, ExampleCalculation)), name = "master")
-    println("CALCULATE")
+    val master = system.actorOf(Props(new Master(listener, logger, ExampleCalculation)), name = "master")
     master ! Calculate
   }
 }

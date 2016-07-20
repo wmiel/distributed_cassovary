@@ -11,7 +11,7 @@ class Worker extends Actor {
   def receive = {
     case SetupWorker(workerSetup) => {
       setup(workerSetup)
-      sender ! Msg(setup_str)
+      sender ! Info(setup_str)
       sender ! WorkerReady
     }
 
