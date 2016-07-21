@@ -16,7 +16,7 @@ class Worker extends Actor {
     }
 
     case Calc(calculation: AbstractCalculation, input: AbstractInput) => {
-      sender ! Result(calculation.calculate(x, input))
+      sender ! Result(calculation.calculate(1, input))
       sender ! WorkerReady
     }
   }

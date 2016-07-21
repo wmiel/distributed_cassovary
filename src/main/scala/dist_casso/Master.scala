@@ -1,12 +1,9 @@
 package dist_casso
 
 import akka.actor._
-import akka.routing.{RoundRobinPool}
 import calculation._
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration._
-
+import scala.collection.mutable
 import scala.collection.mutable.Queue
 
 sealed trait Message
@@ -25,14 +22,16 @@ case object WorkerReady extends Message
 
 
 class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalculation) extends Actor {
-
   val start: Long = System.currentTimeMillis
   val nrOfWorkers = 4
   var workers: Array[ActorRef] = new Array[ActorRef](nrOfWorkers)
-  val work = new Queue[Int]
+  val work = new mutable.Queue[Int]
+  var resultsObtained = 0
   var sum = 0
 
   work ++= List(5, 4, 3, 2, 1, 0)
+
+  var workSize = work.size
 
 
   for (i <- 0 to nrOfWorkers - 1) {
@@ -45,7 +44,12 @@ class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalc
   def handleResult(x: AbstractResult): Any = x match {
     case LongResult(x) => {
       sum += x.toInt
+      resultsObtained += 1
     }
+  }
+
+  def workFinished(): Boolean = {
+    workSize == resultsObtained
   }
 
   def receive = {
@@ -68,7 +72,7 @@ class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalc
       // Input = partitioner.getInput();
       if (work.nonEmpty) {
         sender ! Calc(calculation, SingleVertexInput(work.dequeue()))
-      } else {
+      } else if (workFinished) {
         listener ! Result(LongResult(sum))
         context.stop(self)
       }
