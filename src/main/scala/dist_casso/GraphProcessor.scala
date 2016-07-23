@@ -1,7 +1,7 @@
 package dist_casso
 
 import akka.actor.{Props, ActorSystem}
-import calculation.ExampleCalculation
+import calculation.{RandomPartitionsCalculation, ExampleCalculation}
 
 object GraphProcessor extends App {
   run
@@ -14,7 +14,7 @@ object GraphProcessor extends App {
     val logger = system.actorOf(Props[Logger], name = "logger")
 
     // Set up master and run selected algorithm
-    val master = system.actorOf(Props(new Master(listener, logger, ExampleCalculation)), name = "master")
+    val master = system.actorOf(Props(new Master(listener, logger, ExampleCalculation, new RandomPartitionsCalculation(5))), name = "master")
     master ! Calculate
   }
 }

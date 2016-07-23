@@ -20,18 +20,19 @@ case class SetupWorker(setup: Map[String, String]) extends Message
 
 case object WorkerReady extends Message
 
-
-class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalculation) extends Actor {
+class Master(listener: ActorRef,
+             logger: ActorRef,
+             val calculation: AbstractCalculation,
+             val partitioningMethod: AbstractCalculation
+            ) extends Actor {
   val start: Long = System.currentTimeMillis
   val nrOfWorkers = 4
   var workers: Array[ActorRef] = new Array[ActorRef](nrOfWorkers)
   val work = new mutable.Queue[Int]
-  var resultsObtained = 0
   var sum = 0
 
-  work ++= List(5, 4, 3, 2, 1, 0)
-
-  var workSize = work.size
+  val workPool = new WorkPool(calculation, partitioningMethod)
+  val readyWorkers = new mutable.Queue[ActorRef]
 
 
   for (i <- 0 to nrOfWorkers - 1) {
@@ -42,14 +43,13 @@ class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalc
   //    Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
 
   def handleResult(x: AbstractResult): Any = x match {
+    case Partitions(partitions) => {
+      workPool.setPartitions(partitions)
+    }
     case LongResult(x) => {
       sum += x.toInt
-      resultsObtained += 1
+      workPool.markAsDone
     }
-  }
-
-  def workFinished(): Boolean = {
-    workSize == resultsObtained
   }
 
   def receive = {
@@ -69,12 +69,17 @@ class Master(listener: ActorRef, logger: ActorRef, val calculation: AbstractCalc
 
     case WorkerReady => {
       logger ! Info("Worker ready!")
-      // Input = partitioner.getInput();
-      if (work.nonEmpty) {
-        sender ! Calc(calculation, SingleVertexInput(work.dequeue()))
-      } else if (workFinished) {
+      readyWorkers.enqueue(sender)
+
+      if (workPool.isWorkFinished) {
         listener ! Result(LongResult(sum))
         context.stop(self)
+      } else {
+        while(workPool.isWorkAvailable && readyWorkers.nonEmpty) {
+          val worker = readyWorkers.dequeue()
+          val work = workPool.getWork()
+          worker ! Calc(work._1, work._2)
+        }
       }
     }
 
