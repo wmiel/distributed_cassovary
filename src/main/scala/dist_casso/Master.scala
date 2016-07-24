@@ -22,6 +22,7 @@ case object WorkerReady extends Message
 
 class Master(listener: ActorRef,
              logger: ActorRef,
+             val setup: Map[String, String],
              val calculation: AbstractCalculation,
              val partitioningMethod: AbstractCalculation
             ) extends Actor {
@@ -56,8 +57,6 @@ class Master(listener: ActorRef,
     case Calculate => {
       logger ! Info("Calculate!")
 
-      val setup: Map[String, String] = Map("graph_name" -> "test_graph")
-
       for (i <- 0 to nrOfWorkers - 1) {
         workers(i) ! SetupWorker(setup)
       }
@@ -75,7 +74,7 @@ class Master(listener: ActorRef,
         listener ! Result(LongResult(sum))
         context.stop(self)
       } else {
-        while(workPool.isWorkAvailable && readyWorkers.nonEmpty) {
+        while (workPool.isWorkAvailable && readyWorkers.nonEmpty) {
           val worker = readyWorkers.dequeue()
           val work = workPool.getWork()
           worker ! Calc(work._1, work._2)

@@ -1,35 +1,38 @@
 package dist_casso
 
+import java.io.File
+
 import akka.actor._
 import calculation.{AbstractInput, AbstractCalculation}
+import com.twitter.cassovary.graph.{DirectedGraph, Node, TestGraphs}
+import util.{GzipGraphDownloader, GraphLoader}
 
-class Worker extends Actor {
-  var x = 0
-  var setup_str = ""
-  val r = scala.util.Random
+class Worker extends Actor with GzipGraphDownloader with GraphLoader {
+  var remoteGraphName = ""
+  var graph: DirectedGraph[Node] = null
+
+  def cacheDirectory = {
+    "cache/"
+  }
 
   def receive = {
     case SetupWorker(workerSetup) => {
       setup(workerSetup)
-      sender ! Info(setup_str)
+      sender ! Info(remoteGraphName)
       sender ! WorkerReady
     }
 
     case Calc(calculation: AbstractCalculation, input: AbstractInput) => {
-      sender ! Result(calculation.calculate(1, input))
+      sender ! Result(calculation.calculate(graph, input))
       sender ! WorkerReady
     }
   }
 
   def setup(workerSetup: Map[String, String]) = {
-    val y = r.nextInt(100)
+    remoteGraphName = workerSetup.getOrElse("graph_name", "http://snap.stanford.edu/data/cit-HepTh.txt.gz")
+    val adjacencyList = workerSetup.getOrElse("adjacency_list", "false").toBoolean
 
-    for(z <- 1 to y ) {
-      for(v <- 1 to y) {
-        x += 1
-      }
-    }
-
-    setup_str = workerSetup.getOrElse("graph_name", "not-found") + "_" + x
+    val (directory:String, filename:String) = cacheRemoteFile(remoteGraphName)
+    graph = readGraph(directory, filename, adjacencyList)
   }
 }

@@ -1,19 +1,27 @@
 package calculation
 
+import com.twitter.cassovary.graph.{Node, DirectedGraph}
+
+import scala.collection.mutable.ArrayBuffer
+
 sealed trait AbstractCalculation {
-  def calculate(x: Int, input: AbstractInput): AbstractResult
+  def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult
 }
 
 object ExampleCalculation extends AbstractCalculation {
-  override def calculate(x: Int, input: AbstractInput): AbstractResult = input match {
-    case SingleVertexInput(u) => new LongResult(u + x)
-    case MultipleVertexInput(u) => new LongResult(u.sum)
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = input match {
+    case SingleVertexInput(u) => new LongResult(graph.nodeCount)
+    case MultipleVertexInput(u) => new LongResult(u.size)
   }
 }
 
-class RandomPartitionsCalculation(val partitionsNumber: Int) extends AbstractCalculation {
-  override def calculate(graph: Int, input: AbstractInput): AbstractResult = {
-    return Partitions(List(List(1,2,3), List(4,5,6), List(partitionsNumber, partitionsNumber, partitionsNumber), List(4,5,6), List(4,5,6), List(4,5,6), List(4,5,6), List(4,5,6), List(4,5,6)))
+class RandomPartitionsCalculation(val partitionSize: Int) extends AbstractCalculation {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = {
+    val nodes = new ArrayBuffer[Long]
+    graph.foreach( node =>
+      nodes += (node.id)
+    )
+    return Partitions(nodes.grouped(partitionSize).toSeq)
   }
 }
 

@@ -6,10 +6,16 @@ version := "2.4.4"
 
 scalaVersion := "2.11.7"
 
+resolvers += "Twitter" at "http://maven.twttr.com"
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.4.4",
   "com.typesafe.akka" %% "akka-remote" % "2.4.4"
 )
+
+libraryDependencies += "it.unimi.dsi" % "fastutil" % "7.0.7"
+
+libraryDependencies += "com.twitter" %% "cassovary-core" % "6.3.0"
 
 enablePlugins(JavaServerAppPackaging)
 
