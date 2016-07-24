@@ -4,7 +4,6 @@ import akka.actor._
 import calculation._
 
 import scala.collection.mutable
-import scala.collection.mutable.Queue
 
 sealed trait Message
 

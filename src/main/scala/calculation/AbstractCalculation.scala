@@ -8,20 +8,20 @@ sealed trait AbstractCalculation {
   def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult
 }
 
-object ExampleCalculation extends AbstractCalculation {
+case object ExampleCalculation extends AbstractCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = input match {
     case SingleVertexInput(u) => new LongResult(graph.nodeCount)
     case MultipleVertexInput(u) => new LongResult(u.size)
   }
 }
 
-class RandomPartitionsCalculation(val partitionSize: Int) extends AbstractCalculation {
+case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = {
     val nodes = new ArrayBuffer[Long]
-    graph.foreach( node =>
+    graph.foreach(node =>
       nodes += (node.id)
     )
-    return Partitions(nodes.grouped(partitionSize).toSeq)
+    Partitions(nodes.grouped(partitionSize.toInt).toArray)
   }
 }
 

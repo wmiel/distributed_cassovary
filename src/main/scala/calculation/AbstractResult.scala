@@ -6,6 +6,6 @@ case class LongResult(result: Long) extends AbstractResult {
   override def toString = result.toString
 }
 
-case class Partitions(result: Seq[Seq[Long]]) extends AbstractResult {
+case class Partitions(result: Array[Seq[Long]]) extends AbstractResult {
   override def toString = result.toString
 }

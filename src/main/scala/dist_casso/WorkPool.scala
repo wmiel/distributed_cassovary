@@ -1,6 +1,6 @@
 package dist_casso
 
-import calculation.{MultipleVertexInput, EmptyInput, AbstractCalculation, AbstractInput}
+import calculation._
 
 sealed trait WorkStatus
 

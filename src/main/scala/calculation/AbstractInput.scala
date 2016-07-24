@@ -4,7 +4,7 @@ sealed trait AbstractInput
 
 case object EmptyInput extends AbstractInput
 
-case class SingleVertexInput(vertex: Int) extends AbstractInput {
+case class SingleVertexInput(vertex: Long) extends AbstractInput {
   override def toString = vertex.toString
 }
 
