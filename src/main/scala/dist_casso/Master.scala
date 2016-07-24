@@ -5,20 +5,6 @@ import calculation._
 
 import scala.collection.mutable
 
-sealed trait Message
-
-case object Calculate extends Message
-
-case class Calc(calculation: AbstractCalculation, input: AbstractInput)
-
-case class Result(result: AbstractResult)
-
-case class Info(text: String) extends Message
-
-case class SetupWorker(setup: Map[String, String]) extends Message
-
-case object WorkerReady extends Message
-
 class Master(listener: ActorRef,
              logger: ActorRef,
              val setup: Map[String, String],
