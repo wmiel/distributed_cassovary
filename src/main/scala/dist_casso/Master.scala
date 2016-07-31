@@ -21,9 +21,9 @@ class Master(listener: ActorRef,
   val readyWorkers = new mutable.Queue[ActorRef]
 
 
-  for (i <- 0 to nrOfWorkers - 1) {
-    workers(i) = context.actorOf(Props[Worker], name = "worker_" + i)
-  }
+  //for (i <- 0 to nrOfWorkers - 1) {
+  //  workers(i) = context.actorOf(Props[Worker], name = "worker_" + i)
+  //}
 
   //  val workerRouter = context.actorOf(
   //    Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
@@ -41,10 +41,11 @@ class Master(listener: ActorRef,
   def receive = {
     case Calculate => {
       logger ! Info("Calculate!")
+    }
 
-      for (i <- 0 to nrOfWorkers - 1) {
-        workers(i) ! SetupWorker(setup)
-      }
+    case Connected => {
+      logger ! Info("CONNECTED")
+      sender ! SetupWorker(setup)
     }
 
     case Info(text) => {

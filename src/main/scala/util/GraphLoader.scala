@@ -23,7 +23,7 @@ import com.twitter.cassovary.util.io.{ListOfEdgesGraphReader, AdjacencyListGraph
 
 trait GraphLoader {
   def separatorInt = {
-    ' '.toInt
+    '	'.toInt
   }
 
   def readGraph(path: String, filename: String, adjacencyList: Boolean): DirectedGraph[Node] = {
@@ -32,6 +32,7 @@ trait GraphLoader {
     } else {
       val sep = separatorInt.toChar
       printf("Using Character (%d in Int) as separator\n", sep.toInt)
+      printf("Reading %s from %s\n", filename, path)
       ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = StoredGraphDir.BothInOut,
         separator = sep).toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
       //separator = sep).toArrayBasedDirectedGraph(neighborsSortingStrategy = LeaveUnsorted,

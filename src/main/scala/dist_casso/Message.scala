@@ -6,6 +6,8 @@ sealed trait Message
 
 case object Calculate extends Message
 
+case object Connected extends Message
+
 case class Calc(calculation: AbstractCalculation, input: AbstractInput)
 
 case class Result(result: AbstractResult)

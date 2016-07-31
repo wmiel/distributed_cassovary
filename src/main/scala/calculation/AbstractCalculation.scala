@@ -11,7 +11,16 @@ sealed trait AbstractCalculation {
 case object ExampleCalculation extends AbstractCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = input match {
     case SingleVertexInput(u) => new LongResult(graph.nodeCount)
-    case MultipleVertexInput(u) => new LongResult(u.size)
+    case MultipleVertexInput(u) => {
+      for (i <- 0 to u.size) {
+        for (j <- 0 to u.size) {
+          for (k <- 0 to  u.size) {
+            1 + 1
+          }
+        }
+      }
+      new LongResult(u.size)
+    }
   }
 }
 

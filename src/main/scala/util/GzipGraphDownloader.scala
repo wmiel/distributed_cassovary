@@ -60,10 +60,11 @@ trait GzipGraphDownloader {
   }
 
   def cacheRemoteFile(url : String) : (String, String) = {
-    new File(cacheDirectory).mkdirs()
+    val cacheDir = new File(cacheDirectory)
+    cacheDir.mkdirs()
     val name = url.split("/").last.split("\\.")(0) + ".txt"
-    val target =  cacheDirectory + name
-    val targetFile = new File(target)
+    val targetFile = new File(cacheDir, name)
+    val target =  targetFile.getPath
     if (!targetFile.exists()) {
       downloadAndUnpack(url, target)
     } else {
