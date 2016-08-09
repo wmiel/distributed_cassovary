@@ -12,8 +12,6 @@ class Master(listener: ActorRef,
              val partitioningMethod: AbstractCalculation
             ) extends Actor {
   val start: Long = System.currentTimeMillis
-  val nrOfWorkers = 4
-  var workers: Array[ActorRef] = new Array[ActorRef](nrOfWorkers)
   val work = new mutable.Queue[Int]
   var sum = 0
 
