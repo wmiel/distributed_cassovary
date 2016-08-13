@@ -13,6 +13,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-remote" % "2.4.4"
 )
 
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+
 libraryDependencies += "it.unimi.dsi" % "fastutil" % "7.0.7"
 
 libraryDependencies += "com.twitter" %% "cassovary-core" % "6.3.0"

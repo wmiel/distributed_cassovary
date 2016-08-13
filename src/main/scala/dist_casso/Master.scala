@@ -34,6 +34,10 @@ class Master(listener: ActorRef,
       sum += x.toInt
       workPool.markAsDone
     }
+    case MapResult(map) => {
+      println(map)
+      workPool.markAsDone
+    }
   }
 
   def receive = {

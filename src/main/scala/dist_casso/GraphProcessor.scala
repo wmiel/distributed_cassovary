@@ -1,7 +1,7 @@
 package dist_casso
 
 import akka.actor.{Props, ActorSystem}
-import calculation.{RandomPartitionsCalculation, ExampleCalculation}
+import calculation.{BMatrixCalculation, RandomPartitionsCalculation, ExampleCalculation}
 import com.typesafe.config.ConfigFactory
 
 object GraphProcessor extends App {
@@ -15,12 +15,12 @@ object GraphProcessor extends App {
     val logger = system.actorOf(Props[Logger], name = "logger")
 
     val setup: Map[String, String] = Map(
-      "graph_url" -> "http://snap.stanford.edu/data/cit-HepPh.txt.gz",
+      "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", // "http://snap.stanford.edu/data/cit-HepPh.txt.gz",
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true"
     )
     // Set up master and run selected algorithm
-    val master = system.actorOf(Props(new Master(listener, logger, setup, ExampleCalculation, new RandomPartitionsCalculation(1500))), name = "master")
+    val master = system.actorOf(Props(new Master(listener, logger, setup, BMatrixCalculation, new RandomPartitionsCalculation(1500))), name = "master")
     master ! Calculate
   }
 }

@@ -11,7 +11,7 @@ case object Running extends WorkStatus
 case object Finished extends WorkStatus
 
 class WorkPool(val calculation: AbstractCalculation, val partitioning: AbstractCalculation) {
-  var partitions: Iterator[Seq[Long]] = List().toIterator
+  var partitions: Iterator[Seq[Int]] = List().toIterator
   var partitioningWorkStatus: WorkStatus = New
   var workDone = 0
   var workSize = -1
@@ -20,7 +20,7 @@ class WorkPool(val calculation: AbstractCalculation, val partitioning: AbstractC
     workDone += 1
   }
 
-  def setPartitions(partitions: Seq[Seq[Long]]) = {
+  def setPartitions(partitions: Seq[Seq[Int]]) = {
     this.partitions = partitions.toIterator
     workSize = partitions.size
     partitioningWorkStatus = Finished

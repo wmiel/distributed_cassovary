@@ -1,6 +1,6 @@
 package algorithms
 
-import com.twitter.cassovary.graph.{GraphDir, Node, DirectedGraph}
+import com.twitter.cassovary.graph.{Node, DirectedGraph}
 
 import scala.collection.mutable
 
@@ -9,6 +9,7 @@ class BreadthFirstTraverser(val graph: DirectedGraph[Node], val sourceNodeId: In
   nodesToVisitWithDistance.enqueue((sourceNodeId, 0))
 
   val visited = new mutable.BitSet(graph.maxNodeId + 1)
+  visited.add(sourceNodeId)
 
   override def hasNext: Boolean = {
     nodesToVisitWithDistance.nonEmpty
@@ -18,7 +19,7 @@ class BreadthFirstTraverser(val graph: DirectedGraph[Node], val sourceNodeId: In
     val (nodeId, distance) = nodesToVisitWithDistance.dequeue()
     val node = graph.getNodeById(nodeId).get
 
-    val neighbors = node.inboundNodes ++ node.outboundNodes
+    val neighbors = node.outboundNodes // ++ node.inboundNodes
     neighbors.foreach(id => {
       if (!visited.contains(id)) {
         nodesToVisitWithDistance.enqueue((id, distance + 1))

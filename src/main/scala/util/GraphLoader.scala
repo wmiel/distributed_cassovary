@@ -1,5 +1,7 @@
 package util
 
+import com.twitter.cassovary.graph.StoredGraphDir
+import com.twitter.cassovary.graph.StoredGraphDir.StoredGraphDir
 import com.twitter.cassovary.graph.{StoredGraphDir, DirectedGraph, Node}
 import com.twitter.cassovary.util.io.{ListOfEdgesGraphReader, AdjacencyListGraphReader}
 
@@ -20,23 +22,26 @@ import com.twitter.cassovary.util.io.{ListOfEdgesGraphReader, AdjacencyListGraph
  * modified
  */
 
+import com.twitter.cassovary.graph.NeighborsSortingStrategy._
+
 
 trait GraphLoader {
   def separatorInt = {
-    '	'.toInt
+   // '	'.toInt
+    ' '.toInt
   }
 
-  def readGraph(path: String, filename: String, adjacencyList: Boolean): DirectedGraph[Node] = {
+  def readGraph(path: String, filename: String, adjacencyList: Boolean, graphDir: StoredGraphDir = StoredGraphDir.BothInOut): DirectedGraph[Node] = {
     if (adjacencyList) {
       AdjacencyListGraphReader.forIntIds(path, filename).toArrayBasedDirectedGraph()
     } else {
       val sep = separatorInt.toChar
       printf("Using Character (%d in Int) as separator\n", sep.toInt)
       printf("Reading %s from %s\n", filename, path)
-      ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = StoredGraphDir.BothInOut,
+      ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = graphDir,
         separator = sep).toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
-      //separator = sep).toArrayBasedDirectedGraph(neighborsSortingStrategy = LeaveUnsorted,
-      //      forceSparseRepr = None)
+     // separator = sep).toArrayBasedDirectedGraph(neighborsSortingStrategy = LeaveUnsorted,
+     //       forceSparseRepr = None)
     }
   }
 }
