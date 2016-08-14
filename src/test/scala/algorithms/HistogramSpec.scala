@@ -1,8 +1,6 @@
 package algorithms
 
-import org.scalatest.{FunSpec, Matchers, WordSpec}
-import org.scalatest.matchers.{Matcher, MatchResult}
-import org.scalatest._
+import org.scalatest.{FunSpec, Matchers}
 
 class HistogramSpec extends FunSpec with Matchers {
   describe("Histogram") {

@@ -1,7 +1,8 @@
 package dist_casso
 
-import akka.actor.{Props, ActorSystem}
-import calculation.{BMatrixCalculation, RandomPartitionsCalculation, ExampleCalculation}
+import aggregations.VertexBMatrixAggregation
+import akka.actor.{ActorSystem, Props}
+import calculation.{DistanceBasedCalculation, RandomPartitionsCalculation}
 import com.typesafe.config.ConfigFactory
 
 object GraphProcessor extends App {
@@ -20,7 +21,18 @@ object GraphProcessor extends App {
       "random_cache_dir" -> "true"
     )
     // Set up master and run selected algorithm
-    val master = system.actorOf(Props(new Master(listener, logger, setup, BMatrixCalculation, new RandomPartitionsCalculation(1500))), name = "master")
+    val master = system.actorOf(
+      Props(
+        new Master(
+          listener,
+          logger,
+          setup,
+          new DistanceBasedCalculation(List(VertexBMatrixAggregation)),
+          new RandomPartitionsCalculation(1500)
+        )
+      ),
+      name = "master"
+    )
     master ! Calculate
   }
 }

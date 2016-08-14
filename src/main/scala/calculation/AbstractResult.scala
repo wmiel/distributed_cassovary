@@ -1,19 +1,24 @@
 package calculation
 
-sealed trait AbstractResult
+sealed trait AbstractResult {
+}
 
 case object EmptyResult extends AbstractResult {
   override def toString = "Empty"
 }
 
-case class MapResult(result: Map[Int, Int]) extends AbstractResult {
+trait NonEmptyResult[T] {
+  def result: T
+
   override def toString = result.toString
 }
 
-case class LongResult(result: Long) extends AbstractResult {
-  override def toString = result.toString
-}
+case class MapResult(override val result: Map[Int, Int]) extends AbstractResult with NonEmptyResult[Map[Int, Int]]
 
-case class Partitions(result: Array[Seq[Int]]) extends AbstractResult {
-  override def toString = result.toString
-}
+case class ArrayResult(override val result: Array[Int]) extends AbstractResult with NonEmptyResult[Array[Int]]
+
+case class LongResult(override val result: Long) extends AbstractResult with NonEmptyResult[Long]
+
+case class Partitions(override val result: Array[Seq[Int]]) extends AbstractResult with NonEmptyResult[Array[Seq[Int]]]
+
+case class CompoundResult(override val result: Seq[AbstractResult]) extends AbstractResult with NonEmptyResult[Seq[AbstractResult]]

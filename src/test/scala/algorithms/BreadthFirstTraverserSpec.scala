@@ -1,10 +1,15 @@
 package algorithms
 
-import com.twitter.cassovary.graph.{Node, DirectedGraph}
-import org.scalatest.{Matchers, FunSpec}
-import util.TestGraph
+import com.twitter.cassovary.graph.{DirectedGraph, Node}
+import com.twitter.logging.Level.ERROR
+import com.twitter.logging.Logger
+import org.scalatest.{FunSpec, Matchers}
+import util.Env.TEST
+import util.{CassovaryLogger, TestGraph}
 
 class BreadthFirstTraverserSpec extends FunSpec with Matchers {
+  CassovaryLogger.setUp(TEST)
+
   def bfs(graph: DirectedGraph[Node], sourceId: Int) = new BreadthFirstTraverser(graph, sourceId)
 
   describe("BreadthFirstTraverser") {

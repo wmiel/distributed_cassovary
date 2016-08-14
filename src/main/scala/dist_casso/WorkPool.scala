@@ -50,7 +50,7 @@ class WorkPool(val calculation: AbstractCalculation, val partitioning: AbstractC
   }
 
   def getPartition: AbstractInput = {
-    new MultipleVertexInput(partitions.next())
+    new VertexInput(partitions.next())
   }
 
   def isWorkAvailable: Boolean = {

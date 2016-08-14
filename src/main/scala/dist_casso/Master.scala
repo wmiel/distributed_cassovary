@@ -13,7 +13,6 @@ class Master(listener: ActorRef,
             ) extends Actor {
   val start: Long = System.currentTimeMillis
   val work = new mutable.Queue[Int]
-  var sum = 0
 
   val workPool = new WorkPool(calculation, partitioningMethod)
   val readyWorkers = new mutable.Queue[ActorRef]
@@ -31,11 +30,14 @@ class Master(listener: ActorRef,
       workPool.setPartitions(partitions)
     }
     case LongResult(x) => {
-      sum += x.toInt
       workPool.markAsDone
     }
     case MapResult(map) => {
       println(map)
+      workPool.markAsDone
+    }
+    case CompoundResult(results) => {
+      println(results.head)
       workPool.markAsDone
     }
   }
@@ -59,7 +61,7 @@ class Master(listener: ActorRef,
       readyWorkers.enqueue(sender)
 
       if (workPool.isWorkFinished) {
-        listener ! Result(LongResult(sum))
+        listener ! Result(LongResult(1))
         context.stop(self)
       } else {
         while (workPool.isWorkAvailable && readyWorkers.nonEmpty) {
