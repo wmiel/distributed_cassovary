@@ -1,9 +1,8 @@
 package util
 
-import com.twitter.cassovary.graph.StoredGraphDir
+import com.twitter.cassovary.graph._
 import com.twitter.cassovary.graph.StoredGraphDir.StoredGraphDir
-import com.twitter.cassovary.graph.{StoredGraphDir, DirectedGraph, Node}
-import com.twitter.cassovary.util.io.{ListOfEdgesGraphReader, AdjacencyListGraphReader}
+import com.twitter.cassovary.util.io.{GraphReaderFromDirectory, ListOfEdgesGraphReader, AdjacencyListGraphReader}
 
 /*
  * Copyright 2014 Twitter, Inc.
@@ -31,17 +30,28 @@ trait GraphLoader {
     ' '.toInt
   }
 
-  def readGraph(path: String, filename: String, adjacencyList: Boolean, graphDir: StoredGraphDir = StoredGraphDir.BothInOut): DirectedGraph[Node] = {
+  def readGraph(path: String, filename: String, adjacencyList: Boolean,
+                graphDir: StoredGraphDir = StoredGraphDir.BothInOut): GraphReaderFromDirectory[Int] = {
     if (adjacencyList) {
-      AdjacencyListGraphReader.forIntIds(path, filename).toArrayBasedDirectedGraph()
+      AdjacencyListGraphReader.forIntIds(path, filename) // .toArrayBasedDirectedGraph()
     } else {
       val sep = separatorInt.toChar
       printf("Using Character (%d in Int) as separator\n", sep.toInt)
       printf("Reading %s from %s\n", filename, path)
-      ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = graphDir,
-        separator = sep).toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
-     // separator = sep).toArrayBasedDirectedGraph(neighborsSortingStrategy = LeaveUnsorted,
-     //       forceSparseRepr = None)
+      ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = graphDir, separator = sep)
     }
+  }
+
+  def readGraphAsSharedArrayBasedGraph(path: String, filename: String, adjacencyList: Boolean,
+                                       graphDir: StoredGraphDir = StoredGraphDir.BothInOut): DirectedGraph[Node] = {
+    val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir)
+    rawGraph.toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
+  }
+
+  def readGraphAsArrayBasedGraph(path: String, filename: String, adjacencyList: Boolean,
+                                 graphDir: StoredGraphDir = StoredGraphDir.BothInOut,
+                                 neighborsSortingStrategy: NeighborsSortingStrategy = LeaveUnsorted): DirectedGraph[Node] = {
+    val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir)
+    rawGraph.toArrayBasedDirectedGraph(neighborsSortingStrategy, forceSparseRepr = None)
   }
 }

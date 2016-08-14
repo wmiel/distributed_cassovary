@@ -69,6 +69,6 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     val adjacencyList = workerSetup.getOrElse("adjacency_list", "false").toBoolean
 
     val (directory: String, filename: String) = cacheRemoteFile(graphUrl)
-    graph = readGraph(directory, filename, adjacencyList)
+    graph = readGraphAsArrayBasedGraph(directory, filename, adjacencyList)
   }
 }
