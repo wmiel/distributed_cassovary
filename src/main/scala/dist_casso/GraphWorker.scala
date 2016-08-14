@@ -1,7 +1,6 @@
 package dist_casso
 
-import akka.actor.{SupervisorStrategy, Props, ActorSystem}
-import calculation.{RandomPartitionsCalculation, ExampleCalculation}
+import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 
 object GraphWorker extends App {

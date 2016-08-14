@@ -1,7 +1,6 @@
 package dist_casso
 
-import akka.actor.Actor.Receive
-import akka.actor.{Props, ActorIdentity, Actor, SupervisorStrategy}
+import akka.actor.{Actor, Props, SupervisorStrategy}
 
 class WorkerSupervisor(val masterPath: String)  extends Actor{
   override val supervisorStrategy =

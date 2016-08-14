@@ -1,13 +1,11 @@
 package dist_casso
 
 import java.io.File
-import java.security.MessageDigest
 
-import akka.actor.SupervisorStrategy.{Restart, Escalate}
 import akka.actor._
-import calculation.{AbstractInput, AbstractCalculation}
-import com.twitter.cassovary.graph.{DirectedGraph, Node, TestGraphs}
-import util.{GzipGraphDownloader, GraphLoader}
+import calculation.{AbstractCalculation, AbstractInput}
+import com.twitter.cassovary.graph.{DirectedGraph, Node}
+import util.{GraphLoader, GzipGraphDownloader}
 
 
 class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with GraphLoader {

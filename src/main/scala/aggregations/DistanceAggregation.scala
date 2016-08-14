@@ -1,8 +1,8 @@
 package aggregations
 
 import algorithms.Histogram
-import calculation.{MapResult, AbstractResult, AbstractInput}
-import com.twitter.cassovary.graph.{Node, DirectedGraph}
+import calculation.{AbstractResult, MapResult}
+import com.twitter.cassovary.graph.{DirectedGraph, Node}
 
 import scala.collection.mutable
 
