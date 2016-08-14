@@ -26,37 +26,30 @@ class Master(listener: ActorRef,
   //    Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
 
   def handleResult(x: AbstractResult): Any = x match {
-    case Partitions(partitions) => {
+    case Partitions(partitions) =>
       workPool.setPartitions(partitions)
-    }
-    case LongResult(x) => {
+    case LongResult(x) =>
       workPool.markAsDone
-    }
-    case MapResult(map) => {
+    case MapResult(map) =>
       println(map)
       workPool.markAsDone
-    }
-    case CompoundResult(results) => {
+    case CompoundResult(results) =>
       println(results.head)
       workPool.markAsDone
-    }
   }
 
   def receive = {
-    case Calculate => {
+    case Calculate =>
       logger ! Info("Calculate!")
-    }
 
-    case Connected => {
+    case Connected =>
       logger ! Info("CONNECTED")
       sender ! SetupWorker(setup)
-    }
 
-    case Info(text) => {
+    case Info(text) =>
       logger ! Info(text)
-    }
 
-    case WorkerReady => {
+    case WorkerReady =>
       logger ! Info("Worker ready!")
       readyWorkers.enqueue(sender)
 
@@ -66,15 +59,15 @@ class Master(listener: ActorRef,
       } else {
         while (workPool.isWorkAvailable && readyWorkers.nonEmpty) {
           val worker = readyWorkers.dequeue()
-          val work = workPool.getWork()
-          worker ! Calc(work._1, work._2)
+          workPool.getWork() match {
+            case (calc, input) =>
+              worker ! Calc(calc, input)
+          }
         }
       }
-    }
 
-    case Result(result: AbstractResult) => {
+    case Result(result: AbstractResult) =>
       handleResult(result)
       logger ! Info(result.toString)
-    }
   }
 }
