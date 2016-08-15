@@ -5,6 +5,7 @@ import java.io.File
 import akka.actor._
 import calculation.{AbstractCalculation, AbstractInput}
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
+import graph_transformations.UndirectedDedupTransformation
 import util.{GraphLoader, GzipGraphDownloader}
 
 
@@ -67,6 +68,10 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     val adjacencyList = workerSetup.getOrElse("adjacency_list", "false").toBoolean
 
     val (directory: String, filename: String) = cacheRemoteFile(graphUrl)
-    graph = readGraphAsArrayBasedGraph(directory, filename, adjacencyList)
+    graph = readGraphAsSharedArrayBasedGraph(directory, filename, adjacencyList)
+
+    if (workerSetup.getOrElse("transform_to_undirected", "false").toBoolean) {
+      graph = UndirectedDedupTransformation(graph)
+    }
   }
 }

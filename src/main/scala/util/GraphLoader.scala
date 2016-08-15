@@ -1,8 +1,8 @@
 package util
 
-import com.twitter.cassovary.graph._
 import com.twitter.cassovary.graph.StoredGraphDir.StoredGraphDir
-import com.twitter.cassovary.util.io.{GraphReaderFromDirectory, ListOfEdgesGraphReader, AdjacencyListGraphReader}
+import com.twitter.cassovary.graph._
+import com.twitter.cassovary.util.io.{AdjacencyListGraphReader, GraphReaderFromDirectory, ListOfEdgesGraphReader}
 
 /*
  * Copyright 2014 Twitter, Inc.
@@ -26,19 +26,26 @@ import com.twitter.cassovary.graph.NeighborsSortingStrategy._
 
 trait GraphLoader {
   def separatorInt = {
-   // '	'.toInt
+    // '	'.toInt
     ' '.toInt
   }
 
   def readGraph(path: String, filename: String, adjacencyList: Boolean,
-                graphDir: StoredGraphDir = StoredGraphDir.BothInOut): GraphReaderFromDirectory[Int] = {
+                graphDir: StoredGraphDir = StoredGraphDir.BothInOut,
+                removeDuplicates: Boolean = false): GraphReaderFromDirectory[Int] = {
     if (adjacencyList) {
       AdjacencyListGraphReader.forIntIds(path, filename) // .toArrayBasedDirectedGraph()
     } else {
       val sep = separatorInt.toChar
       printf("Using Character (%d in Int) as separator\n", sep.toInt)
       printf("Reading %s from %s\n", filename, path)
-      ListOfEdgesGraphReader.forIntIds(path, filename, graphDir = graphDir, separator = sep)
+      ListOfEdgesGraphReader.forIntIds(
+        path,
+        filename,
+        graphDir = graphDir,
+        separator = sep,
+        removeDuplicates = removeDuplicates
+      )
     }
   }
 

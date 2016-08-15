@@ -18,7 +18,8 @@ object GraphProcessor extends App {
     val setup: Map[String, String] = Map(
       "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", // "http://snap.stanford.edu/data/cit-HepPh.txt.gz",
       "cache_dir" -> "cache/test",
-      "random_cache_dir" -> "true"
+      "random_cache_dir" -> "true",
+      "transform_to_undirected" -> "false"
     )
     // Set up master and run selected algorithm
     val master = system.actorOf(
@@ -27,8 +28,8 @@ object GraphProcessor extends App {
           listener,
           logger,
           setup,
-          new DistanceBasedCalculation(List(VertexBMatrixAggregation)),
-          new RandomPartitionsCalculation(1500)
+          DistanceBasedCalculation(List(VertexBMatrixAggregation)),
+          RandomPartitionsCalculation(1500)
         )
       ),
       name = "master"
