@@ -1,6 +1,6 @@
-package dist_casso
+package framework.master
 
-import calculation._
+import calculations._
 
 sealed trait WorkStatus
 

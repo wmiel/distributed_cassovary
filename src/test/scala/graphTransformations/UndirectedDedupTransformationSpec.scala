@@ -1,4 +1,4 @@
-package graph_transformations
+package graphTransformations
 
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 import org.scalatest.{FunSpec, Matchers}

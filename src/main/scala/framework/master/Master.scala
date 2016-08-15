@@ -1,9 +1,11 @@
-package dist_casso
+package framework.master
 
 import akka.actor._
-import calculation._
+import calculations._
+import framework._
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class Master(listener: ActorRef,
              logger: ActorRef,
@@ -15,20 +17,13 @@ class Master(listener: ActorRef,
   val work = new mutable.Queue[Int]
 
   val workPool = new WorkPool(calculation, partitioningMethod)
-  val readyWorkers = new mutable.Queue[ActorRef]
+  val workers = ListBuffer[ActorRef]()
+  val availableExecutors = new mutable.Queue[ActorRef]
 
-
-  //for (i <- 0 to nrOfWorkers - 1) {
-  //  workers(i) = context.actorOf(Props[Worker], name = "worker_" + i)
-  //}
-
-  //  val workerRouter = context.actorOf(
-  //    Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
-
-  def handleResult(x: AbstractResult): Any = x match {
+  def handleResult(result: AbstractResult): Any = result match {
     case Partitions(partitions) =>
       workPool.setPartitions(partitions)
-    case LongResult(x) =>
+    case LongResult(_) =>
       workPool.markAsDone
     case MapResult(map) =>
       println(map)
@@ -39,29 +34,27 @@ class Master(listener: ActorRef,
   }
 
   def receive = {
-    case Calculate =>
-      logger ! Info("Calculate!")
-
     case Connected =>
       logger ! Info("CONNECTED")
+      workers += sender
       sender ! SetupWorker(setup)
 
     case Info(text) =>
       logger ! Info(text)
 
-    case WorkerReady =>
+    case ExecutorAvailable =>
       logger ! Info("Worker ready!")
-      readyWorkers.enqueue(sender)
+      availableExecutors.enqueue(sender)
 
       if (workPool.isWorkFinished) {
         listener ! Result(LongResult(1))
         context.stop(self)
       } else {
-        while (workPool.isWorkAvailable && readyWorkers.nonEmpty) {
-          val worker = readyWorkers.dequeue()
+        while (workPool.isWorkAvailable && availableExecutors.nonEmpty) {
+          val worker = availableExecutors.dequeue()
           workPool.getWork() match {
             case (calc, input) =>
-              worker ! Calc(calc, input)
+              worker ! Execute(calc, input)
           }
         }
       }

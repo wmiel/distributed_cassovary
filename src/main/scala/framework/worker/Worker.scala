@@ -1,19 +1,21 @@
-package dist_casso
-
-import java.io.File
+package framework.worker
 
 import akka.actor._
-import calculation.{AbstractCalculation, AbstractInput}
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
-import graph_transformations.UndirectedDedupTransformation
+import framework.{Connected, Info, SetupWorker}
+import graphTransformations.UndirectedDedupTransformation
 import util.{GraphLoader, GzipGraphDownloader}
+
+import scala.collection.mutable.ListBuffer
 
 
 class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with GraphLoader {
   var graphUrl = ""
-  var graph: DirectedGraph[Node] = null
+  var graph: DirectedGraph[Node] = _
   var connected = false
   var cacheDirectoryPath = "cache"
+  val calculationActors = ListBuffer[ActorRef]()
+  var masterRef: ActorRef = ActorRef.noSender
 
   context.actorSelection(masterPath) ! Identify(masterPath)
 
@@ -21,44 +23,48 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     cacheDirectoryPath
   }
 
-  def generateCacheDirectory(): String = {
-    val r = scala.util.Random
-    val s = r.nextString(50)
-    val m = java.security.MessageDigest.getInstance("MD5")
-    val b = s.getBytes("UTF-8")
-    m.update(b, 0, b.length)
-    val md5 = new java.math.BigInteger(1, m.digest()).toString(16)
-    new File("cache", md5).getPath
-  }
-
   def receive = {
-    case ActorIdentity(path, Some(actor)) => {
-      connected = true
-      actor ! Connected
-    }
+    case ActorIdentity(path, Some(actor)) =>
+      if(path == masterPath) {
+        connected = true
+        masterRef = actor
+        actor ! Connected
+      }
 
-    case ActorIdentity(path, None) => {
+    case ActorIdentity(path, None) =>
       println(s"Remote actor not available: $path")
       context.stop(self)
-    }
 
-    case SetupWorker(workerSetup) => {
+    case SetupWorker(workerSetup) =>
       setup(workerSetup)
       sender ! Info(graphUrl)
-      sender ! WorkerReady
-    }
+  }
 
-    case Calc(calculation: AbstractCalculation, input: AbstractInput) => {
-      sender ! Info("Starting calculation")
-      sender ! Result(calculation.calculate(graph, input))
-      sender ! Info("Finished calculation")
-      sender ! WorkerReady
+  def stopExecutors = {
+    calculationActors.foreach { actor: ActorRef =>
+      actor ! PoisonPill
+    }
+    calculationActors.clear()
+  }
+
+  def spawnExecutors(numOfActors: Int) = {
+    for (i <- 0 until numOfActors) {
+      val calculationActor = context.system.actorOf(
+        Props(
+          new CalculationExecutor(
+            masterRef,
+            graph
+          )
+        ),
+        name = "calculation_actor_" + i
+      )
+      calculationActors += calculationActor
     }
   }
 
   def setup(workerSetup: Map[String, String]) = {
     if (workerSetup.getOrElse("random_cache_dir", "false").toBoolean) {
-      cacheDirectoryPath = generateCacheDirectory()
+      cacheDirectoryPath = generateCacheDirectoryName()
     }
     else {
       cacheDirectoryPath = workerSetup.getOrElse("cache_dir", "cache")
@@ -73,5 +79,9 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     if (workerSetup.getOrElse("transform_to_undirected", "false").toBoolean) {
       graph = UndirectedDedupTransformation(graph)
     }
+
+    stopExecutors
+    val numberOfExecutors = workerSetup.getOrElse("calculation_executors_per_worker", "1").toInt
+    spawnExecutors(numberOfExecutors)
   }
 }

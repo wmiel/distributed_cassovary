@@ -32,7 +32,7 @@ trait GraphLoader {
 
   def readGraph(path: String, filename: String, adjacencyList: Boolean,
                 graphDir: StoredGraphDir = StoredGraphDir.BothInOut,
-                removeDuplicates: Boolean = false): GraphReaderFromDirectory[Int] = {
+                removeDuplicates: Boolean = true): GraphReaderFromDirectory[Int] = {
     if (adjacencyList) {
       AdjacencyListGraphReader.forIntIds(path, filename) // .toArrayBasedDirectedGraph()
     } else {

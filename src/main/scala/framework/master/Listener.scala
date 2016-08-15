@@ -1,6 +1,7 @@
-package dist_casso
+package framework.master
 
 import akka.actor.Actor
+import framework.Result
 
 class Listener extends Actor {
   def receive = {

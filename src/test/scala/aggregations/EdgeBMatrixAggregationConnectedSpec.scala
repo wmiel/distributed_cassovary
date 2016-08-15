@@ -1,6 +1,6 @@
 package aggregations
 
-import calculation._
+import calculations._
 import org.scalatest.{FunSpec, Matchers}
 import util.TestGraph
 

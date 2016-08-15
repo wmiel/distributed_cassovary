@@ -72,4 +72,14 @@ trait GzipGraphDownloader {
     }
     (cacheDirectory, name)
   }
+
+  def generateCacheDirectoryName(): String = {
+    val r = scala.util.Random
+    val s = r.nextString(50)
+    val m = java.security.MessageDigest.getInstance("MD5")
+    val b = s.getBytes("UTF-8")
+    m.update(b, 0, b.length)
+    val md5 = new java.math.BigInteger(1, m.digest()).toString(16)
+    new File("cache", md5).getPath
+  }
 }

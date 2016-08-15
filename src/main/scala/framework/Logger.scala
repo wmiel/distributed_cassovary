@@ -1,4 +1,4 @@
-package dist_casso
+package framework
 
 import akka.actor.Actor
 import akka.event.Logging

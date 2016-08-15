@@ -1,9 +1,10 @@
-package dist_casso
+package framework.master
 
 import aggregations.VertexBMatrixAggregation
 import akka.actor.{ActorSystem, Props}
-import calculation.{DistanceBasedCalculation, RandomPartitionsCalculation}
+import calculations.{DistanceBasedCalculation, RandomPartitionsCalculation}
 import com.typesafe.config.ConfigFactory
+import framework.Logger
 
 object GraphProcessor extends App {
   run
@@ -19,9 +20,10 @@ object GraphProcessor extends App {
       "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", // "http://snap.stanford.edu/data/cit-HepPh.txt.gz",
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true",
-      "transform_to_undirected" -> "false"
+      "transform_to_undirected" -> "false",
+      "calculation_executors_per_worker" -> "4"
     )
-    // Set up master and run selected algorithm
+    // Set up master and specify work to do
     val master = system.actorOf(
       Props(
         new Master(
@@ -29,11 +31,10 @@ object GraphProcessor extends App {
           logger,
           setup,
           DistanceBasedCalculation(List(VertexBMatrixAggregation)),
-          RandomPartitionsCalculation(1500)
+          RandomPartitionsCalculation(300)
         )
       ),
       name = "master"
     )
-    master ! Calculate
   }
 }

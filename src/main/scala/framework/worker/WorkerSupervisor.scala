@@ -1,4 +1,4 @@
-package dist_casso
+package framework.worker
 
 import akka.actor.{Actor, Props, SupervisorStrategy}
 
