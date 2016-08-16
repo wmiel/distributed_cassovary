@@ -10,11 +10,11 @@ case object Running extends WorkStatus
 
 case object Finished extends WorkStatus
 
-class WorkPool(val calculation: AbstractCalculation, val partitioning: AbstractCalculation) {
+class WorkPool(val calculation: AbstractCalculation) {
   var partitions: Iterator[Seq[Int]] = List().toIterator
-  var partitioningWorkStatus: WorkStatus = New
   var workDone = 0
   var workSize = -1
+  var assignedPartitions = 0
 
   def markAsDone = {
     workDone += 1
@@ -23,44 +23,27 @@ class WorkPool(val calculation: AbstractCalculation, val partitioning: AbstractC
   def setPartitions(partitions: Seq[Seq[Int]]) = {
     this.partitions = partitions.toIterator
     workSize = partitions.size
-    partitioningWorkStatus = Finished
   }
 
-  def getWork(): (AbstractCalculation, AbstractInput) = {
-    partitioningWorkStatus match {
-      case New => {
-        partitioningWork
-      }
-      case Running => {
-        throw new IllegalStateException("partitioning is running")
-      }
-      case Finished => {
-        assignWork
-      }
-    }
+  def getWork() = {
+    assignWork
   }
 
-  def partitioningWork: (AbstractCalculation, AbstractInput) = {
-    partitioningWorkStatus = Running
-    (partitioning, EmptyInput)
+  def assignWork: (AbstractCalculation, Seq[Int], Int) = {
+    (calculation, getPartition, assignedPartitions)
   }
 
-  def assignWork: (AbstractCalculation, AbstractInput) = {
-    (calculation, getPartition)
-  }
-
-  def getPartition: AbstractInput = {
-    new VertexInput(partitions.next())
+  def getPartition: Seq[Int] = {
+    assignedPartitions += 1
+    partitions.next()
   }
 
   def isWorkAvailable: Boolean = {
-    partitioningWorkStatus == New ||
-      partitions.hasNext
+    partitions.hasNext
   }
 
   def isWorkFinished: Boolean = {
-    partitioningWorkStatus == Finished &&
-      !partitions.hasNext &&
+    !partitions.hasNext &&
       workDone == workSize
   }
 }

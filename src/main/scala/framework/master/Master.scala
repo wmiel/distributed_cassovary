@@ -28,10 +28,9 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
   def runNextJobOrExit() = {
     if (jobDefinitions.hasNext) {
       val currentJobDefinition = jobDefinitions.next
-      val job = new Job(self, workers, currentJobDefinition)
       currentJob = Some(
-        context.actorOf(
-          Props(job),
+        context.system.actorOf(
+          Props(new Job(self, workers, currentJobDefinition)),
           name = currentJobDefinition.getName
         )
       )
@@ -46,78 +45,4 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
     }
     context.system.terminate()
   }
-
-
-  //      sender ! SetupWorker(setup)
-  //
-  //    case Info(text) =>
-  //      logger ! Info(text)
-  //
-  //    case ExecutorAvailable =>
-  //      logger ! Info("Worker ready!")
-  //      availableExecutors.enqueue(sender)
-  //      self ! ScheduleWork
-  //
-  //    case ScheduleWork =>
-  //      /*
-  //
-  //        // job = [{
-  //        //   graph: xxx
-  //        //   setup: {
-  //        //      ...
-  //        //   }
-  //        //   partitioning: Random
-  //        //   calculations: [
-  //        //      A,
-  //        //      B
-  //        //    ]
-  //        // }]
-  //
-  //        if(currentJobFinishedOrEmpty) {
-  //          if(!nextJobAvailable) {
-  //            Shutdown()
-  //          } else {
-  //            JobsManager.selectNextJob
-  //            setupMaster() => {
-  //              clearAvailableExecutors()
-  //              createResultsListeners()
-  //            }
-  //            setupWorkers(JobsManager.getSetup)
-  //          }
-  //        } else {
-  //          executeJob() ->
-  //            partition
-  //            calculate
-  //        }
-  //
-  //
-  //
-  //
-  //        if(workToDo) {
-  //          executeWork()
-  //         } else {
-  //          switchWork()
-  //          executeWork()
-  //         }
-  //
-  //
-  //       */
-  ////
-  ////      if (workPool.isWorkFinished) {
-  ////        listener ! Result(LongResult(1))
-  ////        context.stop(self)
-  ////      } else {
-  ////        while (workPool.isWorkAvailable && availableExecutors.nonEmpty) {
-  ////          val worker = availableExecutors.dequeue()
-  ////          workPool.getWork() match {
-  ////            case (calc, input) =>
-  ////              worker ! Execute(calc, input)
-  ////          }
-  ////        }
-  ////      }
-  //
-  //    case Result(result: AbstractResult) =>
-  //      handleResult(result)
-  //      logger ! Info(result.toString)
-  //  }
 }

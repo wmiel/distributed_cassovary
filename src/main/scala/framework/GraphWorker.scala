@@ -1,7 +1,8 @@
-package framework.worker
+package framework
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import framework.worker.WorkerSupervisor
 
 object GraphWorker extends App {
   run

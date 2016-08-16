@@ -36,7 +36,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
       context.stop(self)
 
     case SetupWorker(workerSetup) =>
-      setup(workerSetup)
+      setup(workerSetup, sender)
       sender ! Info(graphUrl)
   }
 
@@ -47,12 +47,12 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     calculationActors.clear()
   }
 
-  def spawnExecutors(numOfActors: Int) = {
+  def spawnExecutors(numOfActors: Int, jobRef: ActorRef) = {
     for (i <- 0 until numOfActors) {
       val calculationActor = context.system.actorOf(
         Props(
           new CalculationExecutor(
-            masterRef,
+            jobRef,
             graph
           )
         ),
@@ -62,7 +62,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     }
   }
 
-  def setup(workerSetup: Map[String, String]) = {
+  def setup(workerSetup: Map[String, String], jobRef: ActorRef) = {
     if (workerSetup.getOrElse("random_cache_dir", "false").toBoolean) {
       cacheDirectoryPath = generateCacheDirectoryName()
     }
@@ -82,6 +82,6 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
 
     stopExecutors
     val numberOfExecutors = workerSetup.getOrElse("calculation_executors_per_worker", "1").toInt
-    spawnExecutors(numberOfExecutors)
+    spawnExecutors(numberOfExecutors, jobRef)
   }
 }
