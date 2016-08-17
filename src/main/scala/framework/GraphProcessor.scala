@@ -11,7 +11,6 @@ object GraphProcessor extends App {
 
   def run: Unit = {
     val system = ActorSystem("GraphProcessing", ConfigFactory.load("master"))
-    val logger = system.actorOf(Props[Logger], name = "logger")
 
     val setup: Map[String, String] = Map(
       "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
