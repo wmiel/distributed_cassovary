@@ -5,7 +5,9 @@ import calculations.AbstractCalculation
 class JobDefinition(setup: Map[String, String],
                     partitioning: AbstractCalculation,
                     calculation: AbstractCalculation,
-                    name: String) {
+                    name: String,
+                    outputFileNamePrefix: String
+                   ) {
   val id = java.util.UUID.randomUUID.toString
 
   def getJobName = name + "_" + id
@@ -17,6 +19,8 @@ class JobDefinition(setup: Map[String, String],
   def getPartitioning = partitioning
 
   def getCalculation = calculation
+
+  def getOutputFileNamePrefix = outputFileNamePrefix
 
   override def toString = {
     """|Job Description:

@@ -58,8 +58,8 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
             jobRef,
             graph
           )
-        ),
-        name = "calculation_actor_" + i
+        )
+        //, name = "calculation_actor_" + i
       )
       calculationActors += calculationActor
     }

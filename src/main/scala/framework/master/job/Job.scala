@@ -41,7 +41,7 @@ class Job(masterRef: ActorRef,
   }
 
   val resultsHandler = context.system.actorOf(
-    Props(new ResultsHandler(self)),
+    Props(new ResultsHandler(self, jobDefinition.getOutputFileNamePrefix)),
     name = jobDefinition.getJobName + "ResultsHandler"
   )
 

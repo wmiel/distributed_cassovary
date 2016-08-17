@@ -2,3 +2,5 @@
 dist_casso.iml
 target/
 tutorial/
+output/
+*.log

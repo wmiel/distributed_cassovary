@@ -1,12 +1,16 @@
 import NativePackagerHelper._
 
-name := "akka-sample-main-scala"
+name := "distributed-casso"
 
 version := "2.4.4"
 
 scalaVersion := "2.11.7"
 
 resolvers += "Twitter" at "http://maven.twttr.com"
+
+resolvers += Resolver.sbtPluginRepo("releases")
+
+resolvers += Resolver.url("bintray-sbt-plugins", url("http://dl.bintray.com/sbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.4.4",

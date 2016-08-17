@@ -2,9 +2,9 @@ package framework.master.job
 
 import akka.actor.{Actor, ActorRef}
 import calculations.{BMatrix, EdgeBMatrix, Result, VertexBMatrix}
-import framework._
+import framework.{SaveOutput, _}
 
-class ResultsHandler(jobRef: ActorRef) extends Actor {
+class ResultsHandler(jobRef: ActorRef, outputNamePrefix: String) extends Actor {
   var resultVertexBMatrix: Option[VertexBMatrix] = None
   var resultEdgeBMatrix: Option[EdgeBMatrix] = None
 
@@ -26,7 +26,7 @@ class ResultsHandler(jobRef: ActorRef) extends Actor {
   def saveOutputs = {
     List(resultVertexBMatrix, resultEdgeBMatrix).foreach { bmatrix:Option[BMatrix] =>
       bmatrix match {
-        case Some(matrix) => new BMatrixWriter(matrix).save
+        case Some(matrix) => new BMatrixWriter(matrix, outputNamePrefix, matrix.getClass.getSimpleName).save
         case None =>
       }
     }

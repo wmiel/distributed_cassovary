@@ -26,12 +26,14 @@ object GraphProcessor extends App {
         setup,
         RandomPartitionsCalculation(1000),
         VertexBMatrixCalculation,
+        "Job1",
         "Job1"
       ),
       new JobDefinition(
         setup,
         RandomPartitionsCalculation(1000),
         VertexBMatrixCalculation,
+        "Job2",
         "Job2"
       )
     )
