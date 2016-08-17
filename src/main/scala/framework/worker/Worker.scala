@@ -2,7 +2,7 @@ package framework.worker
 
 import akka.actor._
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
-import framework.{Connected, Info, SetupWorker}
+import framework.{Connected, Exit, Info, SetupWorker}
 import graphTransformations.UndirectedDedupTransformation
 import util.{GraphLoader, GzipGraphDownloader}
 
@@ -26,7 +26,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
 
   def receive = {
     case ActorIdentity(path, Some(actor)) =>
-      if(path == masterPath) {
+      if (path == masterPath) {
         connected = true
         masterRef = actor
         actor ! Connected
@@ -37,11 +37,10 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
       context.stop(self)
 
     case SetupWorker(workerSetup) =>
-      val start = System.nanoTime()
       setup(workerSetup, sender)
-      val end = System.nanoTime()
 
-      sender ! Info("GraphLoading:" + (end - start) + "[ns]")
+    case Exit =>
+      context.system.terminate()
   }
 
   def stopExecutors = {
@@ -67,7 +66,16 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
   }
 
   def setup(workerSetup: Map[String, String], jobRef: ActorRef) = {
-    separatorInt = workerSetup.getOrElse("file_separator", " ").charAt(0).toInt
+
+
+    val separatorSetting = workerSetup.getOrElse("file_separator", " ")
+    var autoSeparator = false
+    if(separatorSetting == "auto") {
+      autoSeparator = true
+    } else {
+      separatorInt = workerSetup.getOrElse("file_separator", " ").charAt(0).toInt
+    }
+
 
     if (workerSetup.getOrElse("random_cache_dir", "false").toBoolean) {
       cacheDirectoryPath = generateCacheDirectoryName()
@@ -80,11 +88,23 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     val adjacencyList = workerSetup.getOrElse("adjacency_list", "false").toBoolean
 
     val (directory: String, filename: String) = cacheRemoteFile(graphUrl)
-    graph = readGraphAsSharedArrayBasedGraph(directory, filename, adjacencyList)
+
+    val startTime = System.nanoTime()
+    graph = readGraphAsSharedArrayBasedGraph(directory, filename, adjacencyList, autoSeparator = autoSeparator)
 
     if (workerSetup.getOrElse("transform_to_undirected", "false").toBoolean) {
       graph = UndirectedDedupTransformation(graph)
     }
+
+    val endTime = System.nanoTime()
+    jobRef ! Info("GraphLoading(%s): %d [ns] Nodes: %d Edges: %s"
+      .format(
+        graphUrl,
+        endTime - startTime,
+        graph.nodeCount,
+        graph.edgeCount
+      )
+    )
 
     stopExecutors
     val numberOfExecutors = workerSetup.getOrElse("calculation_executors_per_worker", "1").toInt

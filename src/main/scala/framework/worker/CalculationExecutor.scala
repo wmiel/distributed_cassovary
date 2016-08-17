@@ -4,6 +4,7 @@ import akka.actor._
 import calculations.EmptyInput
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 import framework._
+import graphTransformations.UndirectedDedupTransformation
 
 
 class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) extends Actor {
@@ -16,7 +17,16 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
           jobRef ! Info("Node count: %s, Edge count: %s".format(graph.nodeCount, graph.edgeCount))
           sender ! CalculationResult(partitioning.calculate(graph, EmptyInput))
         case TaskOnPartition(calculation, input, partitionId, resultHandler) =>
-          resultHandler ! CalculationResult(calculation.calculate(graph, input))
+          val startTime = System.nanoTime()
+          val result = CalculationResult(calculation.calculate(graph, input))
+          val endTime = System.nanoTime()
+          jobRef ! Info("Task for Partition(%d) completed in %d [ns]"
+            .format(
+              partitionId,
+              endTime - startTime
+            )
+          )
+          resultHandler ! result
       }
       jobRef ! ExecutorAvailable
     }

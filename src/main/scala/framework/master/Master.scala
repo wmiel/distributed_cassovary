@@ -43,7 +43,7 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
 
   def shutdown = {
     workers.foreach { worker =>
-      worker ! PoisonPill
+      worker ! Exit
     }
     context.system.terminate()
   }

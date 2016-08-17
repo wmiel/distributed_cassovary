@@ -33,6 +33,8 @@ class Job(masterRef: ActorRef,
   var partitions: Option[Array[Seq[Int]]] = None
   val workPool = new WorkPool(jobDefinition.getCalculation)
 
+  val startTime = System.nanoTime()
+
   workers.foreach { worker =>
     worker ! SetupWorker(jobDefinition.getSetup)
   }
@@ -114,6 +116,7 @@ class Job(masterRef: ActorRef,
     implicit val timeout = Timeout(5 seconds)
     val future = resultsHandler ? SaveOutput
     val result = Await.result(future, timeout.duration).asInstanceOf[String]
+    jobLogger ! Info("Job finished in %d [ms]".format(System.nanoTime() - startTime))
     println(result)
 
     masterRef ! JobFinished

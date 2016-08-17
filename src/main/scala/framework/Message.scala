@@ -11,6 +11,8 @@ case object Calculate extends Message
 
 case object Connected extends Message
 
+case object Exit extends Message
+
 case object ScheduleWork extends Message
 
 case object JobFinished extends Message
