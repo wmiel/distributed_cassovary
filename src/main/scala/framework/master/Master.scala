@@ -1,16 +1,37 @@
 package framework.master
 
+import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import framework._
 import framework.master.job.{Job, JobDefinition}
+
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
   var workers = Set[ActorRef]()
   var currentJob: Option[ActorRef] = None
 
-  runNextJobOrExit()
+  override val supervisorStrategy =
+    AllForOneStrategy(
+      maxNrOfRetries = 10,
+      withinTimeRange = 1 minute
+    ) {
+      case _ =>
+        runNextJobOrExit()
+        Stop
+    }
 
   def receive = {
+    case Start =>
+      currentJob match {
+        case None => runNextJobOrExit()
+        case _ =>
+      }
+    case Terminated =>
+      println("TERMINATED")
+      println(sender)
+      println(currentJob)
     case Connected =>
       workers += sender
       currentJob match {
@@ -19,10 +40,10 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
       }
     case JobFinished =>
       currentJob match {
-        case Some(job) => job ! PoisonPill
+        case Some(job) => job ! Exit
         case None =>
       }
-      if(sender == currentJob.get) {
+      if (sender == currentJob.get) {
         runNextJobOrExit()
       }
   }
@@ -31,7 +52,8 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
     if (jobDefinitions.hasNext) {
       val currentJobDefinition = jobDefinitions.next
       currentJob = Some(
-        context.system.actorOf(
+        context.actorOf(
+          //        self.startLink(
           Props(new Job(self, workers, currentJobDefinition)),
           name = currentJobDefinition.getJobName
         )

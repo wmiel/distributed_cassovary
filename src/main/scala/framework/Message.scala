@@ -7,7 +7,7 @@ sealed trait Message
 
 case object SaveOutput extends Message
 
-case object Calculate extends Message
+case object Start extends Message
 
 case object Connected extends Message
 

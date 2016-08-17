@@ -11,6 +11,7 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.reflect.internal.util.StringOps
 
 sealed trait JobStatus
 
@@ -77,6 +78,8 @@ class Job(masterRef: ActorRef,
       self ! ScheduleWork
     case info: Info =>
       jobLogger forward info
+    case Exit =>
+      context.stop(self)
   }
 
   private
@@ -112,8 +115,7 @@ class Job(masterRef: ActorRef,
   }
 
   def notifyMaster = {
-    println("NOTIFY MASTER")
-    implicit val timeout = Timeout(5 seconds)
+    implicit val timeout = Timeout(1 minute)
     val future = resultsHandler ? SaveOutput
     val result = Await.result(future, timeout.duration).asInstanceOf[String]
     jobLogger ! Info("Job finished in %d [ms]".format(System.nanoTime() - startTime))

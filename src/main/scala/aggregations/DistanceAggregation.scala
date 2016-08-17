@@ -28,7 +28,6 @@ case object EdgeBMatrixAggregationConnected extends DistanceAggregation {
         }
       }
     }
-
     results.toMap
   }
 }

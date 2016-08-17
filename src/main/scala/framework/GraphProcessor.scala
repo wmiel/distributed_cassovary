@@ -27,6 +27,12 @@ object GraphProcessor extends App {
         RandomPartitionsCalculation(1000),
         VertexBMatrixCalculation,
         "Job1"
+      ),
+      new JobDefinition(
+        setup,
+        RandomPartitionsCalculation(1000),
+        VertexBMatrixCalculation,
+        "Job2"
       )
     )
     // Set up master and specify work to do
@@ -36,5 +42,6 @@ object GraphProcessor extends App {
       ),
       name = "master"
     )
+    master ! Start
   }
 }
