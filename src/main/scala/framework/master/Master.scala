@@ -33,7 +33,7 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
       currentJob = Some(
         context.system.actorOf(
           Props(new Job(self, workers, currentJobDefinition)),
-          name = currentJobDefinition.getName
+          name = currentJobDefinition.getJobName
         )
       )
     } else {

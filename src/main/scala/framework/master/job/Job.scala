@@ -39,7 +39,12 @@ class Job(masterRef: ActorRef,
 
   val resultsHandler = context.system.actorOf(
     Props(new ResultsHandler(self)),
-    name = jobDefinition.getName + "ResultsHandler"
+    name = jobDefinition.getJobName + "ResultsHandler"
+  )
+
+  val jobLogger = context.system.actorOf(
+    Props(new JobLogger(self, jobDefinition)),
+    name = jobDefinition.getJobName + "Logger"
   )
 
   def receive = {
@@ -68,6 +73,8 @@ class Job(masterRef: ActorRef,
     case WorkDone =>
       workPool.markAsDone
       self ! ScheduleWork
+    case info: Info =>
+      jobLogger forward info
   }
 
   private

@@ -1,7 +1,7 @@
 package framework.master.job
 
 import akka.actor.{Actor, ActorRef}
-import calculations.{EdgeBMatrix, Result, VertexBMatrix, BMatrix}
+import calculations.{BMatrix, EdgeBMatrix, Result, VertexBMatrix}
 import framework._
 
 class ResultsHandler(jobRef: ActorRef) extends Actor {

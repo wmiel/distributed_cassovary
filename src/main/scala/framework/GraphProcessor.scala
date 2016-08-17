@@ -14,11 +14,12 @@ object GraphProcessor extends App {
     val logger = system.actorOf(Props[Logger], name = "logger")
 
     val setup: Map[String, String] = Map(
-      "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", // "http://snap.stanford.edu/data/cit-HepPh.txt.gz",
+      "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true",
-      "transform_to_undirected" -> "false",
-      "calculation_executors_per_worker" -> "4"
+      "transform_to_undirected" -> "true",
+      "calculation_executors_per_worker" -> "1",
+      "file_separator" -> " "
     )
 
     val jobs = List(

@@ -17,7 +17,6 @@ sealed trait AbstractCalculation {
 }
 
 case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalculation {
-  //extends Partitioning {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result = {
     val nodes = new ArrayBuffer[Int]
     graph.foreach(node =>

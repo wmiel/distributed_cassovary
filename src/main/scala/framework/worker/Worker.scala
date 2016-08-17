@@ -16,6 +16,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
   var cacheDirectoryPath = "cache"
   val calculationActors = ListBuffer[ActorRef]()
   var masterRef: ActorRef = ActorRef.noSender
+  var separatorInt = '	'.toInt
 
   context.actorSelection(masterPath) ! Identify(masterPath)
 
@@ -36,8 +37,11 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
       context.stop(self)
 
     case SetupWorker(workerSetup) =>
+      val start = System.nanoTime()
       setup(workerSetup, sender)
-      sender ! Info(graphUrl)
+      val end = System.nanoTime()
+
+      sender ! Info("GraphLoading:" + (end - start) + "[ns]")
   }
 
   def stopExecutors = {
@@ -63,6 +67,8 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
   }
 
   def setup(workerSetup: Map[String, String], jobRef: ActorRef) = {
+    separatorInt = workerSetup.getOrElse("file_separator", " ").charAt(0).toInt
+
     if (workerSetup.getOrElse("random_cache_dir", "false").toBoolean) {
       cacheDirectoryPath = generateCacheDirectoryName()
     }

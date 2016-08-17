@@ -25,10 +25,7 @@ import com.twitter.cassovary.graph.NeighborsSortingStrategy._
 
 
 trait GraphLoader {
-  def separatorInt = {
-    // '	'.toInt
-    ' '.toInt
-  }
+  var separatorInt: Int
 
   def readGraph(path: String, filename: String, adjacencyList: Boolean,
                 graphDir: StoredGraphDir = StoredGraphDir.BothInOut,

@@ -21,7 +21,7 @@ class BMatrixWriter(bMatrix: BMatrix) {
     }
 
     print("#number of nodes: %d\n".format(totalNumberOfNodes))
-    print("#number of edges: %d\n".format(totalNumberOfEdges / 2))
+    print("#number of edges: %d\n".format(totalNumberOfEdges))
     print("#B-Matrix END\n")
   }
 }

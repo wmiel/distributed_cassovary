@@ -26,7 +26,7 @@ object CassovaryLogger {
           level = Some(Level.INFO),
           handlers = List(
             FileHandler(
-              filename = "production.log",
+              filename = "framework.log",
               rollPolicy = Policy.SigHup
             )
           )

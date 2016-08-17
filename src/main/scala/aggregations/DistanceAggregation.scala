@@ -9,16 +9,6 @@ sealed trait DistanceAggregation {
   def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]])
 }
 
-case object VertexBMatrixAggregation extends DistanceAggregation {
-  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
-    val allDistances = distances.foldLeft(Iterator[(Int, Int)]()) {
-      (iterator, perVertexDistances) => iterator ++ perVertexDistances
-    }
-
-   Histogram[(Int, Int)](_._2)(allDistances.toSeq)
-  }
-}
-
 case object EdgeBMatrixAggregationConnected extends DistanceAggregation {
   override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
     val distanceMaps = distances.map { perNodeDistances: Iterator[(Int, Int)] => perNodeDistances.toMap }

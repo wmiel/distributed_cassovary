@@ -13,6 +13,7 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
     case Execute(task) => {
       task match {
         case PartitioningTask(partitioning) =>
+          jobRef ! Info("Node count: %s, Edge count: %s".format(graph.nodeCount, graph.edgeCount))
           sender ! CalculationResult(partitioning.calculate(graph, EmptyInput))
         case TaskOnPartition(calculation, input, partitionId, resultHandler) =>
           resultHandler ! CalculationResult(calculation.calculate(graph, input))
