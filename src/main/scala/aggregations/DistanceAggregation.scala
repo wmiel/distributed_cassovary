@@ -1,27 +1,26 @@
 package aggregations
 
 import algorithms.Histogram
-import calculations.{AbstractResult, MapResult}
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 
 import scala.collection.mutable
 
 sealed trait DistanceAggregation {
-  def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]): AbstractResult
+  def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]])
 }
 
 case object VertexBMatrixAggregation extends DistanceAggregation {
-  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]): MapResult = {
+  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
     val allDistances = distances.foldLeft(Iterator[(Int, Int)]()) {
       (iterator, perVertexDistances) => iterator ++ perVertexDistances
     }
 
-    MapResult(Histogram[(Int, Int)](_._2)(allDistances.toSeq))
+   Histogram[(Int, Int)](_._2)(allDistances.toSeq)
   }
 }
 
 case object EdgeBMatrixAggregationConnected extends DistanceAggregation {
-  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]): MapResult = {
+  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
     val distanceMaps = distances.map { perNodeDistances: Iterator[(Int, Int)] => perNodeDistances.toMap }
     val results = mutable.Map[Int, Int]().withDefaultValue(0)
 
@@ -40,12 +39,12 @@ case object EdgeBMatrixAggregationConnected extends DistanceAggregation {
       }
     }
 
-    MapResult(results.toMap)
+    results.toMap
   }
 }
 
 case object EdgeBMatrixAggregationDisconnected extends DistanceAggregation {
-  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]): MapResult = {
+  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
     val results = mutable.Map[Int, Int]().withDefaultValue(0)
 
     distances.foreach { perNodeDistances: Iterator[(Int, Int)] =>
@@ -62,6 +61,6 @@ case object EdgeBMatrixAggregationDisconnected extends DistanceAggregation {
       }}
     }
 
-    MapResult(results.toMap)
+    results.toMap
   }
 }

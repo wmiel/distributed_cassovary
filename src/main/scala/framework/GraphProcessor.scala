@@ -1,8 +1,7 @@
 package framework
 
-import aggregations.VertexBMatrixAggregation
 import akka.actor.{ActorSystem, Props}
-import calculations.{DistanceBasedCalculation, RandomPartitionsCalculation}
+import calculations.{RandomPartitionsCalculation, VertexBMatrixCalculation}
 import com.typesafe.config.ConfigFactory
 import framework.master.Master
 import framework.master.job.JobDefinition
@@ -26,7 +25,7 @@ object GraphProcessor extends App {
       new JobDefinition(
         setup,
         RandomPartitionsCalculation(1000),
-        DistanceBasedCalculation(List(VertexBMatrixAggregation)),
+        VertexBMatrixCalculation,
         "Job1"
       )
     )

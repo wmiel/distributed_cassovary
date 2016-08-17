@@ -22,7 +22,9 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
         case Some(job) => job ! PoisonPill
         case None =>
       }
-      runNextJobOrExit()
+      if(sender == currentJob.get) {
+        runNextJobOrExit()
+      }
   }
 
   def runNextJobOrExit() = {

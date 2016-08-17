@@ -1,6 +1,6 @@
 package aggregations
 
-import calculations.{DistanceBasedCalculation, VertexInput}
+import calculations.VertexInput
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 import util.CassovaryLogger
 import util.Env.TEST

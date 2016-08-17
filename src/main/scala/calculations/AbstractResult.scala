@@ -1,24 +1,39 @@
 package calculations
 
-sealed trait AbstractResult {
-}
+sealed trait Result
 
-case object EmptyResult extends AbstractResult {
-  override def toString = "Empty"
-}
-
-trait NonEmptyResult[T] {
-  def result: T
+trait NonEmptyResult[T] extends Result {
+  val result: T
 
   override def toString = result.toString
 }
 
-case class MapResult(override val result: Map[Int, Int]) extends AbstractResult with NonEmptyResult[Map[Int, Int]]
+case class Partitions(override val result: Array[Seq[Int]]) extends NonEmptyResult[Array[Seq[Int]]]
 
-case class ArrayResult(override val result: Array[Int]) extends AbstractResult with NonEmptyResult[Array[Int]]
+case class Distances(result: Seq[Seq[(Int, Int)]]) extends NonEmptyResult[Seq[Seq[(Int, Int)]]]
 
-case class LongResult(override val result: Long) extends AbstractResult with NonEmptyResult[Long]
+trait BMatrix {
+  val result: Map[(Int, Int), Int]
 
-case class Partitions(override val result: Array[Seq[Int]]) extends AbstractResult with NonEmptyResult[Array[Seq[Int]]]
+  def add(other: BMatrix) = {
+    (result.keySet ++ other.result.keySet).map(key =>
+      (key, result.getOrElse(key, 0) + other.result.getOrElse(key, 0))
+    ).toMap
+  }
 
-case class CompoundResult(override val result: Seq[AbstractResult]) extends AbstractResult with NonEmptyResult[Seq[AbstractResult]]
+  def toOutputFormat = {
+    result.toList.sortBy(_._1).map { case ((x, y), z) => (x, y, z) }
+  }
+}
+
+case class VertexBMatrix(override val result: Map[(Int, Int), Int]) extends NonEmptyResult[Map[(Int, Int), Int]] with BMatrix {
+  def +(other: VertexBMatrix) = {
+    VertexBMatrix(this.add(other))
+  }
+}
+
+case class EdgeBMatrix(override val result: Map[(Int, Int), Int]) extends NonEmptyResult[Map[(Int, Int), Int]] with BMatrix {
+  def +(other: EdgeBMatrix) = {
+    EdgeBMatrix(this.add(other))
+  }
+}

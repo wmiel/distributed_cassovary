@@ -1,9 +1,11 @@
 package framework
 
 import akka.actor.ActorRef
-import calculations.{AbstractCalculation, AbstractInput, AbstractResult, VertexInput}
+import calculations.{AbstractCalculation, Result, VertexInput}
 
 sealed trait Message
+
+case object SaveOutput extends Message
 
 case object Calculate extends Message
 
@@ -13,18 +15,19 @@ case object ScheduleWork extends Message
 
 case object JobFinished extends Message
 
-case class Execute(task: Task)
+case class Execute(task: Task) extends Message
 
-case class Result(result: AbstractResult)
+case class CalculationResult(result: Result) extends Message
 
-case class AddWorker(workerRef: ActorRef)
+case object WorkDone extends Message
+
+case class AddWorker(workerRef: ActorRef)  extends Message
 
 case class Info(text: String) extends Message
 
 case class SetupWorker(setup: Map[String, String]) extends Message
 
 case object ExecutorAvailable extends Message
-
 
 sealed trait Task
 

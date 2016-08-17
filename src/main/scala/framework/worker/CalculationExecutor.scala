@@ -13,22 +13,11 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
     case Execute(task) => {
       task match {
         case PartitioningTask(partitioning) =>
-          println("PARTITIONING")
-          sender ! Result(partitioning.calculate(graph, EmptyInput))
+          sender ! CalculationResult(partitioning.calculate(graph, EmptyInput))
         case TaskOnPartition(calculation, input, partitionId, resultHandler) =>
-          println("CALCULATING")
-          resultHandler ! Result(calculation.calculate(graph, input))
-
+          resultHandler ! CalculationResult(calculation.calculate(graph, input))
       }
       jobRef ! ExecutorAvailable
     }
-
-    //
-    //      calculation: AbstractCalculation, input: AbstractInput) =>
-    //    //      sender ! Info("Starting calculation")
-    //    sender ! Result(calculation.calculate(graph, input))
-    //    //      sender ! Info("Finished calculation")
-    //    //      println(self.path.name + "CALCULATED STUFF")
-    //    sender ! ExecutorAvailable
   }
 }

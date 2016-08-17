@@ -1,19 +1,24 @@
 package calculations
 
-import aggregations.DistanceAggregation
 import algorithms.BreadthFirstTraverser
 import com.twitter.cassovary.graph._
 
 import scala.collection.mutable.ArrayBuffer
 
-sealed trait AbstractCalculation {
-  def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult
+trait DistanceBasedCalculation {
+  def bfs(graph: DirectedGraph[Node], input: AbstractInput): Seq[Iterator[(Int, Int)]] = input match {
+    case VertexInput(vertices) =>
+      vertices.map(vertex => new BreadthFirstTraverser(graph, vertex))
+  }
 }
 
-// trait Partitioning extends AbstractCalculation
+sealed trait AbstractCalculation {
+  def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result
+}
 
-case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalculation { //extends Partitioning {
-  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): AbstractResult = {
+case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalculation {
+  //extends Partitioning {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result = {
     val nodes = new ArrayBuffer[Int]
     graph.foreach(node =>
       nodes += node.id
@@ -22,14 +27,27 @@ case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalcu
   }
 }
 
-case class DistanceBasedCalculation(aggregations: Seq[DistanceAggregation]) extends AbstractCalculation {
-  def bfs(graph: DirectedGraph[Node], input: AbstractInput): Seq[Iterator[(Int, Int)]] = input match {
-    case VertexInput(vertices) =>
-      vertices.map(vertex => new BreadthFirstTraverser(graph, vertex))
-  }
 
-  override def calculate(graph: DirectedGraph[Node], input: AbstractInput) = {
-    val distances = bfs(graph, input)
-    CompoundResult(aggregations.map(_.aggregate(graph, distances)))
+case object BFSDistances extends AbstractCalculation with DistanceBasedCalculation {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result = {
+    Distances(bfs(graph, input).map { t => t.toSeq })
+  }
+}
+
+case object VertexBMatrixCalculation extends AbstractCalculation with DistanceBasedCalculation {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): VertexBMatrix = {
+    val distancesPerVertex = bfs(graph, input)
+    val kNeighborhoodSizesPerVertex: Seq[Map[Int, Int]] = distancesPerVertex.map { traverser =>
+      traverser
+        .toSeq
+        .groupBy(_._2) // group by distance
+        .map({ case (k, vertexList) => (k, vertexList.size) }) // count frequencies
+    }
+    val result: Map[(Int, Int), Int] = kNeighborhoodSizesPerVertex
+      .flatten
+      .groupBy(x => x)
+      .map({ case (kAndNumberOfKNeighbors, aggregatedList) => kAndNumberOfKNeighbors -> aggregatedList.size }) // count frequencies
+
+    VertexBMatrix(result)
   }
 }
