@@ -1,11 +1,16 @@
 package util
+
 import com.twitter.logging.{Level, _}
 import util.Env.{PRODUCTION, TEST}
 
 sealed abstract class Env(val name: String)
+
 object Env {
+
   case object TEST extends Env("test")
+
   case object PRODUCTION extends Env("production")
+
 }
 
 object CassovaryLogger {

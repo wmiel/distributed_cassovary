@@ -6,7 +6,7 @@ import framework.Info
 import util.CassovaryLogger
 import util.Env.PRODUCTION
 
-class JobLogger(val masterRef: ActorRef, val jobDefinition: JobDefinition) extends Actor{
+class JobLogger(val masterRef: ActorRef, val jobDefinition: JobDefinition) extends Actor {
   CassovaryLogger.setUp(PRODUCTION)
 
   val logger = Logger.get("Job")

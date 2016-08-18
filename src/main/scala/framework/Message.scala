@@ -23,7 +23,7 @@ case class CalculationResult(result: Result) extends Message
 
 case object WorkDone extends Message
 
-case class AddWorker(workerRef: ActorRef)  extends Message
+case class AddWorker(workerRef: ActorRef) extends Message
 
 case class Info(text: String) extends Message
 
@@ -34,6 +34,7 @@ case object ExecutorAvailable extends Message
 sealed trait Task
 
 case class PartitioningTask(partitioning: AbstractCalculation) extends Task
+
 case class TaskOnPartition(calculation: AbstractCalculation,
                            input: VertexInput,
                            partitionId: Int,

@@ -24,10 +24,10 @@ class JobDefinition(setup: Map[String, String],
 
   override def toString = {
     """|Job Description:
-       | id: %s
-       | name: %s
-       | parititioning: %s
-       | setup:
+      | id: %s
+      | name: %s
+      | parititioning: %s
+      | setup:
 %s
     """.format(
       id,

@@ -41,12 +41,13 @@ case object EdgeBMatrixAggregationDisconnected extends DistanceAggregation {
         val node = graph.getNodeById(nodeId).get
         node.outboundNodes().foreach { neighborId: Int =>
           val neighborDistance = distancesMap.getOrElse(neighborId, -1)
-          if(neighborDistance >= 0) {
+          if (neighborDistance >= 0) {
             val distance = nodeDistance + neighborDistance
             results.update(distance, results(distance) + 1)
           }
         }
-      }}
+      }
+      }
     }
 
     results.toMap

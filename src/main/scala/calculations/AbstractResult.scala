@@ -26,6 +26,14 @@ trait BMatrix {
   }
 }
 
+trait PerVertexValue[T] {
+  val result: Seq[(Int, T)]
+
+  def toOutputFormat = {
+    result.toList.sortBy(_._1)
+  }
+}
+
 case class VertexBMatrix(override val result: Map[(Int, Int), Int]) extends NonEmptyResult[Map[(Int, Int), Int]] with BMatrix {
   def +(other: VertexBMatrix) = {
     VertexBMatrix(this.add(other))
@@ -38,7 +46,7 @@ case class EdgeBMatrix(override val result: Map[(Int, Int), Int]) extends NonEmp
   }
 }
 
-case class OutgoingDegreePerVertex(override val result: Seq[(Int, Int)]) extends NonEmptyResult[Seq[(Int, Int)]] {
+case class OutgoingDegreePerVertex(override val result: Seq[(Int, Int)]) extends NonEmptyResult[Seq[(Int, Int)]] with PerVertexValue[Int] {
   def +(other: OutgoingDegreePerVertex) = {
     OutgoingDegreePerVertex(result ++ other.result)
   }

@@ -69,7 +69,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
 
     val separatorSetting = workerSetup.getOrElse("file_separator", " ")
     var autoSeparator = false
-    if(separatorSetting == "auto") {
+    if (separatorSetting == "auto") {
       autoSeparator = true
     } else {
       separatorInt = workerSetup.getOrElse("file_separator", " ").charAt(0).toInt

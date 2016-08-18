@@ -38,7 +38,7 @@ trait GraphLoader {
     val separatorPattern = new Regex("\\s")
     val commentPattern = new Regex("#")
 
-    while(fileLinesIterator.hasNext) {
+    while (fileLinesIterator.hasNext) {
       val line = fileLinesIterator.next()
       commentPattern.findFirstIn(line) match {
         case None =>
@@ -63,7 +63,7 @@ trait GraphLoader {
     if (adjacencyList) {
       AdjacencyListGraphReader.forIntIds(path, filename) // .toArrayBasedDirectedGraph()
     } else {
-      val sep = if(autoSeparator) {
+      val sep = if (autoSeparator) {
         println("Using auto separator")
         findSeparatorInFile(path, filename)
       } else {
@@ -82,7 +82,7 @@ trait GraphLoader {
   }
 
   def readGraphAsSharedArrayBasedGraph(path: String, filename: String, adjacencyList: Boolean,
-                                       autoSeparator:Boolean = false,
+                                       autoSeparator: Boolean = false,
                                        graphDir: StoredGraphDir = StoredGraphDir.BothInOut): DirectedGraph[Node] = {
     val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir, autoSeparator = autoSeparator)
     rawGraph.toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
@@ -90,7 +90,7 @@ trait GraphLoader {
 
   def readGraphAsArrayBasedGraph(path: String, filename: String, adjacencyList: Boolean,
                                  graphDir: StoredGraphDir = StoredGraphDir.BothInOut,
-                                 autoSeparator:Boolean = false,
+                                 autoSeparator: Boolean = false,
                                  neighborsSortingStrategy: NeighborsSortingStrategy = LeaveUnsorted): DirectedGraph[Node] = {
     val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir, autoSeparator = autoSeparator)
     rawGraph.toArrayBasedDirectedGraph(neighborsSortingStrategy, forceSparseRepr = None)

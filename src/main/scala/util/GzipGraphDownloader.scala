@@ -32,7 +32,7 @@ trait GzipGraphDownloader {
 
   def cacheDirectory: String
 
-  private def downloadFile(url : String, targetPath : String) : Int = {
+  private def downloadFile(url: String, targetPath: String): Int = {
     (new URL(url) #> new File(targetPath)).!
   }
 
@@ -43,7 +43,9 @@ trait GzipGraphDownloader {
     val fileOutput = new FileOutputStream(outputFilename)
     val buffer = Array.ofDim[Byte](BUFFER_SIZE)
     var len = 0
-    while ( {len = gzInput.read(buffer);len} > 0) {
+    while ( {
+      len = gzInput.read(buffer); len
+    } > 0) {
       fileOutput.write(buffer, 0, len)
     }
     fileOutput.close()
@@ -61,12 +63,12 @@ trait GzipGraphDownloader {
     new File(tmpGzFile).delete()
   }
 
-  def cacheRemoteFile(url : String) : (String, String) = {
+  def cacheRemoteFile(url: String): (String, String) = {
     val cacheDir = new File(cacheDirectory)
     cacheDir.mkdirs()
     val name = url.split("/").last.split("\\.")(0) + ".txt"
     val targetFile = new File(cacheDir, name)
-    val target =  targetFile.getPath
+    val target = targetFile.getPath
     if (!targetFile.exists()) {
       downloadAndUnpack(url, target)
     } else {

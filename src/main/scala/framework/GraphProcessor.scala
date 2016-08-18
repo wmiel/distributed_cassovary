@@ -1,7 +1,7 @@
 package framework
 
 import akka.actor.{ActorSystem, Props}
-import calculations.{RandomPartitionsCalculation, VertexBMatrixCalculation}
+import calculations.{EdgeBMatrixCalculation, OutgoingDegreePerVertexCalculation, RandomPartitionsCalculation, VertexBMatrixCalculation}
 import com.typesafe.config.ConfigFactory
 import framework.master.Master
 import framework.master.job.JobDefinition
@@ -13,7 +13,7 @@ object GraphProcessor extends App {
     val system = ActorSystem("GraphProcessing", ConfigFactory.load("master"))
 
     val setup: Map[String, String] = Map(
-      "graph_url" -> "http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", //http://snap.stanford.edu/data/facebook_combined.txt.gz", //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
+      "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", //, //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true",
       "transform_to_undirected" -> "true",
@@ -32,9 +32,16 @@ object GraphProcessor extends App {
       new JobDefinition(
         setup,
         RandomPartitionsCalculation(1000),
-        VertexBMatrixCalculation,
+        EdgeBMatrixCalculation,
         "Job2",
         "Job2"
+      ),
+      new JobDefinition(
+        setup,
+        RandomPartitionsCalculation(1000),
+        OutgoingDegreePerVertexCalculation,
+        "Job3",
+        "Job3"
       )
     )
     // Set up master and specify work to do
