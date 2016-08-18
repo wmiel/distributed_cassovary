@@ -37,3 +37,9 @@ case class EdgeBMatrix(override val result: Map[(Int, Int), Int]) extends NonEmp
     EdgeBMatrix(this.add(other))
   }
 }
+
+case class OutgoingDegreePerVertex(override val result: Seq[(Int, Int)]) extends NonEmptyResult[Seq[(Int, Int)]] {
+  def +(other: OutgoingDegreePerVertex) = {
+    OutgoingDegreePerVertex(result ++ other.result)
+  }
+}

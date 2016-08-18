@@ -1,6 +1,4 @@
 package util
-import java.util.logging
-
 import com.twitter.logging.{Level, _}
 import util.Env.{PRODUCTION, TEST}
 

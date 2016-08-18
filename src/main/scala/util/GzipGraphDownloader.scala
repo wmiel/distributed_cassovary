@@ -16,10 +16,12 @@
  */
 package util
 
-import com.twitter.logging.Logger
-import java.io.{FileOutputStream, FileInputStream, File}
+import java.io.{File, FileInputStream, FileOutputStream}
 import java.net.URL
 import java.util.zip.GZIPInputStream
+
+import com.twitter.logging.Logger
+
 import scala.sys.process._
 
 /**

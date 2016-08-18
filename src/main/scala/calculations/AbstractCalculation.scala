@@ -26,6 +26,13 @@ case class RandomPartitionsCalculation(partitionSize: Int) extends AbstractCalcu
   }
 }
 
+case object OutgoingDegreePerVertexCalculation extends AbstractCalculation {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result = input match {
+    case VertexInput(vertices) =>
+      val degrees = vertices.map(vertex => (vertex, graph.getNodeById(vertex).get.outboundCount))
+      OutgoingDegreePerVertex(degrees)
+  }
+}
 
 case object BFSDistances extends AbstractCalculation with DistanceBasedCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): Result = {
@@ -50,3 +57,5 @@ case object VertexBMatrixCalculation extends AbstractCalculation with DistanceBa
     VertexBMatrix(result)
   }
 }
+
+

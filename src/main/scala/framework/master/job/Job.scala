@@ -11,7 +11,6 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.reflect.internal.util.StringOps
 
 sealed trait JobStatus
 

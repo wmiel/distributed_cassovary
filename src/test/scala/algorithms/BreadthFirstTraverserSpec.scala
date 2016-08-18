@@ -1,8 +1,6 @@
 package algorithms
 
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
-import com.twitter.logging.Level.ERROR
-import com.twitter.logging.Logger
 import org.scalatest.{FunSpec, Matchers}
 import util.Env.TEST
 import util.{CassovaryLogger, TestGraph}

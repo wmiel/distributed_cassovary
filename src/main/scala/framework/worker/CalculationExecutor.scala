@@ -4,7 +4,6 @@ import akka.actor._
 import calculations.EmptyInput
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 import framework._
-import graphTransformations.UndirectedDedupTransformation
 
 
 class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) extends Actor {

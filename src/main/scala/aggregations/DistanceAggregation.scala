@@ -1,6 +1,5 @@
 package aggregations
 
-import algorithms.Histogram
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 
 import scala.collection.mutable

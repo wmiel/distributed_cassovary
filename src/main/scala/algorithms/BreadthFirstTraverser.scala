@@ -1,6 +1,6 @@
 package algorithms
 
-import com.twitter.cassovary.graph.{Node, DirectedGraph}
+import com.twitter.cassovary.graph.{DirectedGraph, Node}
 
 import scala.collection.mutable
 

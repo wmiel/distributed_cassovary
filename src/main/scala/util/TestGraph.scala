@@ -1,8 +1,11 @@
 package util
 
 import com.twitter.cassovary.graph._
+import util.Env.TEST
 
 object TestGraph {
+  CassovaryLogger.setUp(TEST)
+
   def lineGraph = ArrayBasedDirectedGraph(Seq(
     NodeIdEdgesMaxId(1, Array(2)),
     NodeIdEdgesMaxId(2, Array(3)),
