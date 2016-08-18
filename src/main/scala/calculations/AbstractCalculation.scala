@@ -3,12 +3,20 @@ package calculations
 import algorithms.BreadthFirstTraverser
 import com.twitter.cassovary.graph._
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 trait DistanceBasedCalculation {
   def bfs(graph: DirectedGraph[Node], input: AbstractInput): Seq[Iterator[(Int, Int)]] = input match {
     case VertexInput(vertices) =>
       vertices.map(vertex => new BreadthFirstTraverser(graph, vertex))
+  }
+
+  def aggregate(perVertexMap: Seq[scala.collection.Map[Int, Int]]) = {
+    perVertexMap
+      .flatten
+      .groupBy(x => x)
+      .map({ case (kAndNumberOfKNeighbors, aggregatedList) => kAndNumberOfKNeighbors -> aggregatedList.size })
   }
 }
 
@@ -43,18 +51,66 @@ case object BFSDistances extends AbstractCalculation with DistanceBasedCalculati
 case object VertexBMatrixCalculation extends AbstractCalculation with DistanceBasedCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): VertexBMatrix = {
     val distancesPerVertex = bfs(graph, input)
-    val kNeighborhoodSizesPerVertex: Seq[Map[Int, Int]] = distancesPerVertex.map { traverser =>
+    val distanceFrequenciesPerVertex: Seq[Map[Int, Int]] = distancesPerVertex.map { traverser =>
       traverser
         .toSeq
         .groupBy(_._2) // group by distance
         .map({ case (k, vertexList) => (k, vertexList.size) }) // count frequencies
     }
-    val result: Map[(Int, Int), Int] = kNeighborhoodSizesPerVertex
-      .flatten
-      .groupBy(x => x)
-      .map({ case (kAndNumberOfKNeighbors, aggregatedList) => kAndNumberOfKNeighbors -> aggregatedList.size }) // count frequencies
-
+    val result: Map[(Int, Int), Int] = aggregate(distanceFrequenciesPerVertex)
     VertexBMatrix(result)
+  }
+}
+
+// Alternative approach:
+//case object EdgeBMatrixAggregationDisconnected extends DistanceAggregation {
+//  override def aggregate(graph: DirectedGraph[Node], distances: Seq[Iterator[(Int, Int)]]) = {
+//    val results = mutable.Map[Int, Int]().withDefaultValue(0)
+//
+//    distances.foreach { perNodeDistances: Iterator[(Int, Int)] =>
+//      val distancesMap = perNodeDistances.toMap
+//      distancesMap.foreach { case (nodeId, nodeDistance) => {
+//        val node = graph.getNodeById(nodeId).get
+//        node.outboundNodes().foreach { neighborId: Int =>
+//          val neighborDistance = distancesMap.getOrElse(neighborId, -1)
+//          if (neighborDistance >= 0) {
+//            val distance = nodeDistance + neighborDistance
+//            results.update(distance, results(distance) + 1)
+//          }
+//        }
+//      }
+//      }
+//    }
+//
+//    results.toMap
+//  }
+//}
+
+case object EdgeBMatrixCalculation extends AbstractCalculation with DistanceBasedCalculation {
+  override def calculate(graph: DirectedGraph[Node], input: AbstractInput): EdgeBMatrix = {
+    val distanceMaps: Seq[Map[Int, Int]] =
+      bfs(graph, input).map { distancesForVertex: Iterator[(Int, Int)] => distancesForVertex.toMap }
+
+    val distanceFrequenciesPerVertex: Seq[mutable.HashMap[Int, Int]] =
+      distanceMaps.map { _ => mutable.HashMap[Int, Int]() }
+
+    graph.foreach { node: Node =>
+      val nodeId = node.id
+      node.outboundNodes().foreach { neighborId: Int =>
+        distanceMaps.zip(distanceFrequenciesPerVertex).foreach { case (distances, results) =>
+          val nodeDistance = distances.getOrElse(nodeId, -1)
+          val neighborDistance = distances.getOrElse(neighborId, -1)
+
+          if (nodeDistance >= 0 && neighborDistance >= 0) {
+            val distance = nodeDistance + neighborDistance
+            results.update(distance, results.getOrElse(distance, 0) + 1)
+          }
+        }
+      }
+    }
+
+    val result: Map[(Int, Int), Int] = aggregate(distanceFrequenciesPerVertex)
+    EdgeBMatrix(result)
   }
 }
 
