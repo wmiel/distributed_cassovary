@@ -4,7 +4,7 @@ name := "distributed-casso"
 
 version := "2.4.4"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 resolvers += "Twitter" at "http://maven.twttr.com"
 
@@ -25,7 +25,7 @@ libraryDependencies += "com.twitter" %% "cassovary-core" % "6.3.0"
 
 enablePlugins(JavaServerAppPackaging)
 
-mainClass in Compile := Some("dist_casso.GraphProcessor")
+mainClass in Compile := Some("framework.GraphProcessor")
 
 mappings in Universal ++= {
   // optional example illustrating how to copy additional directory

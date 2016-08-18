@@ -13,7 +13,7 @@ object GraphProcessor extends App {
     val system = ActorSystem("GraphProcessing", ConfigFactory.load("master"))
 
     val setup: Map[String, String] = Map(
-      "graph_url" -> "http://snap.stanford.edu/data/facebook_combined.txt.gz", //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
+      "graph_url" -> "http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", //http://snap.stanford.edu/data/facebook_combined.txt.gz", //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true",
       "transform_to_undirected" -> "true",
