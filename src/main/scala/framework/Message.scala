@@ -25,9 +25,25 @@ case object WorkDone extends Message
 
 case class AddWorker(workerRef: ActorRef) extends Message
 
-case class Info(text: String) extends Message
+/* LOGGING */
+sealed trait Log
 
-case class FinalInfo(text: String) extends Message
+case class Info(text: String) extends Log
+
+case object JobStartedInfo extends Log
+
+case class GraphLoadedInfo(time: Long, nodes: Int, edges: Long) extends Log
+
+case class ParititioningFinishedInfo(parititions: Int, time: Long) extends Log
+
+case class TaskFinishedInfo(partitionId:Int, time: Long) extends Log
+
+case object CalculationStartedInfo extends Log
+
+case class CalculationFinishedInfo(time: Long) extends Log
+
+case class JobFinishedInfo(totalTime: Long, calculationTime: Long) extends Log
+/* /LOGGING */
 
 case class SetupWorker(setup: Map[String, String]) extends Message
 

@@ -72,14 +72,13 @@ class Job(masterRef: ActorRef,
       result match {
         case Partitions(newPartitions) =>
           calculationStartTime = Some(System.nanoTime())
+          jobLogger ! CalculationStartedInfo
           setPartitions(newPartitions)
-        case VertexBMatrix(map) =>
-          println(map)
       }
     case WorkDone =>
       workPool.markAsDone
       self ! ScheduleWork
-    case info: Info =>
+    case info: Log =>
       jobLogger forward info
     case Exit =>
       context.stop(self)
@@ -123,18 +122,16 @@ class Job(masterRef: ActorRef,
     val outputWriteResponse = Await.result(outputWriteFuture, timeout.duration).asInstanceOf[String]
     val timeNow = System.nanoTime()
 
-    val jobFinalLogFuture = jobLogger ? FinalInfo("Job finished in total %d [ms] / %d [ms] calculation time.".
-      format(
+    val jobFinalLogFuture =
+      jobLogger ? JobFinishedInfo(
         timeNow - totalStartTime,
         timeNow - calculationStartTime.getOrElse(timeNow)
       )
-    )
     Await.result(jobFinalLogFuture, timeout.duration).asInstanceOf[String]
 
     val jobFinishedFuture = masterRef ? JobFinished
     val jobFinishedResponse = Await.result(jobFinishedFuture, timeout.duration).asInstanceOf[String]
     if (jobFinishedResponse == "OK") {
-      println("OK")
       context.stop(self)
     }
   }

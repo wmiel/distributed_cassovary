@@ -10,6 +10,8 @@ class JobDefinition(setup: Map[String, String],
                    ) {
   val id = java.util.UUID.randomUUID.toString
 
+  def getId = id
+
   def getJobName = name + "_" + id
 
   def getName = name
@@ -23,14 +25,13 @@ class JobDefinition(setup: Map[String, String],
   def getOutputFileNamePrefix = outputFileNamePrefix
 
   override def toString = {
-    """|Job Description:
-      | id: %s
-      | name: %s
-      | parititioning: %s
-      | calculation: %s
-      | output file name prefix: %s
-      | setup:
-%s
+    """
+      |id: %s
+      |name: %s
+      |parititioning: %s
+      |calculation: %s
+      |output file name prefix: %s
+      |%s
     """.format(
       id,
       name,
@@ -44,6 +45,6 @@ class JobDefinition(setup: Map[String, String],
   private
 
   def formattedSetup = {
-    setup.map { case (key, value) => "|  %s: %s".format(key, value) }.mkString("\n")
+    setup.map { case (key, value) => "%s: %s".format(key, value) }.mkString("\n")
   }
 }

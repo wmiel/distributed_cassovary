@@ -2,7 +2,7 @@ package framework.worker
 
 import akka.actor._
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
-import framework.{Connected, Exit, Info, SetupWorker}
+import framework._
 import graphTransformations.UndirectedDedupTransformation
 import util.{GraphLoader, GzipGraphDownloader}
 
@@ -120,14 +120,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     }
 
     val endTime = System.nanoTime()
-    jobRef ! Info("GraphLoading(%s): %d [ns] Nodes: %d Edges: %s"
-      .format(
-        graphUrl,
-        endTime - startTime,
-        graph.nodeCount,
-        graph.edgeCount
-      )
-    )
+    jobRef ! GraphLoadedInfo(endTime - startTime, graph.nodeCount, graph.edgeCount)
 
     stopExecutors
     val numberOfExecutors = workerSetup.getOrElse("calculation_executors_per_worker", "1").toInt

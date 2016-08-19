@@ -1,7 +1,7 @@
 package framework.worker
 
 import akka.actor._
-import calculations.EmptyInput
+import calculations.{EmptyInput, Partitions}
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
 import framework._
 
@@ -13,23 +13,21 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
     case Execute(task) => {
       task match {
         case PartitioningTask(partitioning) =>
-          jobRef ! Info("Node count: %s, Edge count: %s".format(graph.nodeCount, graph.edgeCount))
-          sender ! CalculationResult(partitioning.calculate(graph, EmptyInput))
+          val startTime = System.nanoTime()
+          val partitionedGraph = partitioning.calculate(graph, EmptyInput)
+          sender ! CalculationResult(partitionedGraph)
+          partitionedGraph match {
+            case Partitions(partitions) =>
+              jobRef ! ParititioningFinishedInfo(partitions.length, System.nanoTime() - startTime)
+            case _ =>
+              jobRef ! ParititioningFinishedInfo(-1, System.nanoTime() - startTime)
+          }
         case TaskOnPartition(calculation, input, partitionId, resultHandler) =>
           val startTime = System.nanoTime()
           val result = CalculationResult(calculation.calculate(graph, input))
           val endTime = System.nanoTime()
 
-          val t = Thread.currentThread()
-          val tName = t.getName
-
-          jobRef ! Info("Task for Partition(%d) completed in %d [ns] on [%s]"
-            .format(
-              partitionId,
-              endTime - startTime,
-              tName
-            )
-          )
+          jobRef ! TaskFinishedInfo(partitionId, endTime - startTime)
           resultHandler ! result
       }
       jobRef ! ExecutorAvailable
