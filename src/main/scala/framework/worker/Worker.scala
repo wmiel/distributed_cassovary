@@ -7,6 +7,8 @@ import graphTransformations.UndirectedDedupTransformation
 import util.{GraphLoader, GzipGraphDownloader}
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 
 class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with GraphLoader {
@@ -19,6 +21,8 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
   var separatorInt = '	'.toInt
 
   context.actorSelection(masterPath) ! Identify(masterPath)
+
+  context.system.scheduler.schedule(30 seconds, 2 minutes)(logMemoryUsage)(context.system.dispatcher)
 
   def cacheDirectory = {
     cacheDirectoryPath
@@ -59,12 +63,26 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
             graph
           )
         ).
-        withDispatcher("akka.actor.my-thread-pool-dispatcher")
-        //withDispatcher("akka.actor.my-dispatcher")
+        //withDispatcher("akka.actor.my-thread-pool-dispatcher")
+          withDispatcher("akka.actor.my-dispatcher")
 
       )
       calculationActors += calculationActor
     }
+  }
+
+  def logMemoryUsage = {
+    val mb = 1024 * 1024
+    val runtime = Runtime.getRuntime()
+
+    val memoryInfo = " Used Memory:%d MB, Free Memory:%d MB, Total Memory:%d MB, Max Memory:%d MB".format(
+      (runtime.totalMemory() - runtime.freeMemory()) / mb,
+      runtime.freeMemory() / mb,
+      runtime.totalMemory() / mb,
+      runtime.maxMemory() / mb
+    )
+
+    println(memoryInfo)
   }
 
   def setup(workerSetup: Map[String, String], jobRef: ActorRef) = {
@@ -90,7 +108,12 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     val (directory: String, filename: String) = cacheRemoteFile(graphUrl)
 
     val startTime = System.nanoTime()
-    graph = readGraphAsSharedArrayBasedGraph(directory, filename, adjacencyList, autoSeparator = autoSeparator)
+    val graphImpl = workerSetup.getOrElse("graph_type", "shared")
+    graph = if(graphImpl == "shared") {
+      readGraphAsSharedArrayBasedGraph(directory, filename, adjacencyList, autoSeparator = autoSeparator)
+    } else {
+      readGraphAsArrayBasedGraph(directory, filename, adjacencyList, autoSeparator = autoSeparator)
+    }
 
     if (workerSetup.getOrElse("transform_to_undirected", "false").toBoolean) {
       graph = UndirectedDedupTransformation(graph)

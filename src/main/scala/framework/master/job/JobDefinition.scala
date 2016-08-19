@@ -27,6 +27,7 @@ class JobDefinition(setup: Map[String, String],
       | id: %s
       | name: %s
       | parititioning: %s
+      | calculation: %s
       | output file name prefix: %s
       | setup:
 %s
@@ -34,6 +35,7 @@ class JobDefinition(setup: Map[String, String],
       id,
       name,
       partitioning.getClass.getSimpleName,
+      calculation.getClass.getSimpleName,
       outputFileNamePrefix,
       formattedSetup
     ).stripMargin

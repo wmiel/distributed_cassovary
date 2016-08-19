@@ -16,14 +16,18 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
           jobRef ! Info("Node count: %s, Edge count: %s".format(graph.nodeCount, graph.edgeCount))
           sender ! CalculationResult(partitioning.calculate(graph, EmptyInput))
         case TaskOnPartition(calculation, input, partitionId, resultHandler) =>
-          println("EXECUTE")
           val startTime = System.nanoTime()
           val result = CalculationResult(calculation.calculate(graph, input))
           val endTime = System.nanoTime()
-          jobRef ! Info("Task for Partition(%d) completed in %d [ns]"
+
+          val t = Thread.currentThread()
+          val tName = t.getName
+
+          jobRef ! Info("Task for Partition(%d) completed in %d [ns] on [%s]"
             .format(
               partitionId,
-              endTime - startTime
+              endTime - startTime,
+              tName
             )
           )
           resultHandler ! result

@@ -27,6 +27,8 @@ case class AddWorker(workerRef: ActorRef) extends Message
 
 case class Info(text: String) extends Message
 
+case class FinalInfo(text: String) extends Message
+
 case class SetupWorker(setup: Map[String, String]) extends Message
 
 case object ExecutorAvailable extends Message

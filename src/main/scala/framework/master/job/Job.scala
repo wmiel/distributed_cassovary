@@ -122,12 +122,14 @@ class Job(masterRef: ActorRef,
     val outputWriteFuture = resultsHandler ? SaveOutput
     val outputWriteResponse = Await.result(outputWriteFuture, timeout.duration).asInstanceOf[String]
     val timeNow = System.nanoTime()
-    jobLogger ! Info("Job finished in total %d [ms] / %d [ms] calculation time.".
+
+    val jobFinalLogFuture = jobLogger ? FinalInfo("Job finished in total %d [ms] / %d [ms] calculation time.".
       format(
         timeNow - totalStartTime,
         timeNow - calculationStartTime.getOrElse(timeNow)
       )
     )
+    Await.result(jobFinalLogFuture, timeout.duration).asInstanceOf[String]
 
     val jobFinishedFuture = masterRef ? JobFinished
     val jobFinishedResponse = Await.result(jobFinishedFuture, timeout.duration).asInstanceOf[String]
