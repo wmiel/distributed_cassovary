@@ -30,6 +30,7 @@ class ResultsHandler(jobRef: ActorRef, outputNamePrefix: String) extends Actor {
       }
       jobRef ! WorkDone
     case SaveOutput =>
+      println("SAVING OUTPUT")
       saveOutputs
       sender ! "DONE"
   }
@@ -43,7 +44,7 @@ class ResultsHandler(jobRef: ActorRef, outputNamePrefix: String) extends Actor {
     }
     List(perVertexOutgoingDegrees).foreach { perVertex: Option[PerVertexValue[Int]] =>
       perVertex match {
-        case Some(perVertexValues) => new PerVertexWriter(perVertexOutgoingDegrees, outputNamePrefix, perVertex.getClass.getSimpleName).save)
+        case Some(perVertexValues) => new PerVertexWriter(perVertexValues, outputNamePrefix, perVertexValues.getClass.getSimpleName).save
         case None =>
       }
 

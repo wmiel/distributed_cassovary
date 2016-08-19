@@ -17,7 +17,7 @@ object GraphProcessor extends App {
       "cache_dir" -> "cache/test",
       "random_cache_dir" -> "true",
       "transform_to_undirected" -> "true",
-      "calculation_executors_per_worker" -> "4",
+      "calculation_executors_per_worker" -> "1",
       "file_separator" -> "auto"
     )
 
@@ -31,7 +31,7 @@ object GraphProcessor extends App {
       ),
       new JobDefinition(
         setup,
-        RandomPartitionsCalculation(1000),
+        RandomPartitionsCalculation(100),
         EdgeBMatrixCalculation,
         "Job2",
         "Job2"

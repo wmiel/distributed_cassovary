@@ -27,12 +27,14 @@ class JobDefinition(setup: Map[String, String],
       | id: %s
       | name: %s
       | parititioning: %s
+      | output file name prefix: %s
       | setup:
 %s
     """.format(
       id,
       name,
       partitioning.getClass.getSimpleName,
+      outputFileNamePrefix,
       formattedSetup
     ).stripMargin
   }

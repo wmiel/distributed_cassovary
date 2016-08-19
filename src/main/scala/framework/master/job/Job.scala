@@ -33,7 +33,10 @@ class Job(masterRef: ActorRef,
   var partitions: Option[Array[Seq[Int]]] = None
   val workPool = new WorkPool(jobDefinition.getCalculation)
 
-  val startTime = System.nanoTime()
+  val totalStartTime = System.nanoTime()
+  var calculationStartTime: Option[Long] = None
+
+  var masterNotifiedAboutFinish = false
 
   workers.foreach { worker =>
     worker ! SetupWorker(jobDefinition.getSetup)
@@ -68,6 +71,7 @@ class Job(masterRef: ActorRef,
     case CalculationResult(result: Result) =>
       result match {
         case Partitions(newPartitions) =>
+          calculationStartTime = Some(System.nanoTime())
           setPartitions(newPartitions)
         case VertexBMatrix(map) =>
           println(map)
@@ -114,12 +118,22 @@ class Job(masterRef: ActorRef,
   }
 
   def notifyMaster = {
-    implicit val timeout = Timeout(1 minute)
-    val future = resultsHandler ? SaveOutput
-    val result = Await.result(future, timeout.duration).asInstanceOf[String]
-    jobLogger ! Info("Job finished in %d [ms]".format(System.nanoTime() - startTime))
-    println(result)
+    implicit val timeout = Timeout(10 minutes)
+    val outputWriteFuture = resultsHandler ? SaveOutput
+    val outputWriteResponse = Await.result(outputWriteFuture, timeout.duration).asInstanceOf[String]
+    val timeNow = System.nanoTime()
+    jobLogger ! Info("Job finished in total %d [ms] / %d [ms] calculation time.".
+      format(
+        timeNow - totalStartTime,
+        timeNow - calculationStartTime.getOrElse(timeNow)
+      )
+    )
 
-    masterRef ! JobFinished
+    val jobFinishedFuture = masterRef ? JobFinished
+    val jobFinishedResponse = Await.result(jobFinishedFuture, timeout.duration).asInstanceOf[String]
+    if (jobFinishedResponse == "OK") {
+      println("OK")
+      context.stop(self)
+    }
   }
 }

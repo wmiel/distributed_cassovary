@@ -2,9 +2,9 @@ package framework.master.job
 
 import java.io.BufferedWriter
 
-import calculations.OutgoingDegreePerVertex
+import calculations.PerVertexValue
 
-class PerVertexWriter(perVertexOutgoingDegrees: OutgoingDegreePerVertex,
+class PerVertexWriter(perVertexOutgoingDegrees: PerVertexValue[Int],
                       override val fileNamePrefix: String,
                       override val fileNameSuffix: String) extends OutputFileWriter {
 

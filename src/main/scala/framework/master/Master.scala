@@ -17,8 +17,9 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
       maxNrOfRetries = 10,
       withinTimeRange = 1 minute
     ) {
-      case _ =>
+      case something: Any =>
         runNextJobOrExit()
+        println(something)
         Stop
     }
 
@@ -38,14 +39,10 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
         case Some(job) => job ! AddWorker(sender)
         case None =>
       }
-    case JobFinished =>
-      currentJob match {
-        case Some(job) => job ! Exit
-        case None =>
-      }
-      if (sender == currentJob.get) {
-        runNextJobOrExit()
-      }
+    case JobFinished => {
+      sender ! "OK"
+      runNextJobOrExit()
+    }
   }
 
   def runNextJobOrExit() = {
