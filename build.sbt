@@ -40,3 +40,7 @@ scriptClasspath := Seq("../config/") ++ scriptClasspath.value
 licenses := Seq(("CC0", url("http://creativecommons.org/publicdomain/zero/1.0")))
 
 mainClass in Compile := Some("framework.GraphProcessor")
+
+autoScalaLibrary := true
+
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true)

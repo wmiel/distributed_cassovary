@@ -15,7 +15,7 @@ object GraphWorker extends App with ConfigLoader {
     println(s"Using master: ${masterEndpoint}:${masterPort}")
 
     val system = ActorSystem("GraphWorkerSystem", ConfigFactory.load(config))
-    val masterPath = "akka.tcp://GraphProcessing@127.0.0.1:2551/user/master"
+    val masterPath = s"akka.tcp://GraphProcessing@${masterEndpoint}:${masterPort}/user/master"
     system.actorOf(Props(new WorkerSupervisor(masterPath)), name = "workerSupervisor")
   }
 }
