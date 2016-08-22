@@ -2,15 +2,15 @@ package framework
 
 import akka.actor.{ActorSystem, Props}
 import calculations.{EdgeBMatrixCalculation, OutgoingDegreePerVertexCalculation, RandomPartitionsCalculation, VertexBMatrixCalculation}
-import com.typesafe.config.ConfigFactory
 import framework.master.Master
 import framework.master.job.JobDefinition
 
-object GraphProcessor extends App {
+object GraphProcessor extends App with ConfigLoader {
   run
 
   def run: Unit = {
-    val system = ActorSystem("GraphProcessing", ConfigFactory.load("master"))
+    val config = parseCustomConfig("master", "config/master.conf")
+    val system = ActorSystem("GraphProcessing", config)
 
     val setup: Map[String, String] = Map(
       "graph_url" -> "http://snap.stanford.edu/data/email-Enron.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //, //http://snap.stanford.edu/data/p2p-Gnutella24.txt.gz", // "http://snap.stanford.edu/data/facebook_combined.txt.gz", //"http://snap.stanford.edu/data/cit-HepPh.txt.gz", //
@@ -74,4 +74,6 @@ object GraphProcessor extends App {
     )
     master ! Start
   }
+
+
 }

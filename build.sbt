@@ -25,8 +25,6 @@ libraryDependencies += "com.twitter" %% "cassovary-core" % "6.3.0"
 
 enablePlugins(JavaServerAppPackaging)
 
-mainClass in Compile := Some("framework.GraphProcessor")
-
 mappings in Universal ++= {
   // optional example illustrating how to copy additional directory
   directory("scripts") ++
@@ -40,3 +38,5 @@ mappings in Universal ++= {
 scriptClasspath := Seq("../config/") ++ scriptClasspath.value
 
 licenses := Seq(("CC0", url("http://creativecommons.org/publicdomain/zero/1.0")))
+
+mainClass in Compile := Some("framework.GraphProcessor")

@@ -4,3 +4,5 @@ target/
 tutorial/
 output/
 *.log
+.DS_Store
+cache/
