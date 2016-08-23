@@ -1,6 +1,7 @@
 package algorithms
 
 import com.twitter.cassovary.graph.{DirectedGraph, Node}
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 
 import scala.collection.mutable
 
@@ -27,5 +28,14 @@ class BreadthFirstTraverser(val graph: DirectedGraph[Node], val sourceNodeId: In
       }
     })
     (nodeId, distance)
+  }
+
+  def notVisitedAsMap = {
+    val map = new Int2IntOpenHashMap(graph.nodeCount)
+    while(hasNext) {
+      val (key, value) = next()
+      map.put(key, value)
+    }
+    map
   }
 }

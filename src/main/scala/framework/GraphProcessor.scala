@@ -1,7 +1,7 @@
 package framework
 
 import akka.actor.{ActorSystem, Props}
-import calculations.{EdgeBMatrixCalculation, OutgoingDegreePerVertexCalculation, RandomPartitionsCalculation, VertexBMatrixCalculation}
+import calculations.{OutgoingDegreePerVertexCalculation, RandomPartitionsCalculation, VertexBMatrixCalculation}
 import framework.master.Master
 import framework.master.job.JobDefinition
 
@@ -9,19 +9,64 @@ object GraphProcessor extends App with ConfigLoader {
   run
 
   def jobs(setup: Map[String, String]) = {
-    List(new JobDefinition(
-      setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/p2p-Gnutella25.txt.gz", "calculation_executors_per_worker" -> "4"),
-      RandomPartitionsCalculation(100),
-      EdgeBMatrixCalculation,
-      "Job_40_of_49",
-      "Job_40_of_49"),
-    new JobDefinition(
-      setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/p2p-Gnutella30.txt.gz", "calculation_executors_per_worker" -> "4"),
-      RandomPartitionsCalculation(100),
-      EdgeBMatrixCalculation,
-      "Job_43_of_49",
-      "Job_43_of_49"
-    )
+    List(
+      new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/email-EuAll.txt.gz",
+          "calculation_executors_per_worker" -> "1"),
+        RandomPartitionsCalculation(250),
+        OutgoingDegreePerVertexCalculation,
+        "Job_4_1_of_1",
+        "Job_4_1_of_1"
+      ),
+      new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/email-EuAll.txt.gz", "calculation_executors_per_worker" -> "1"),
+        RandomPartitionsCalculation(250),
+        OutgoingDegreePerVertexCalculation,
+        "Job_3_23_of_29",
+        "Job_3_23_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/cit-HepTh.txt.gz", "calculation_executors_per_worker" -> "1"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_24_of_29",
+        "Job_3_24_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/cit-HepTh.txt.gz", "calculation_executors_per_worker" -> "2"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_25_of_29",
+        "Job_3_25_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/cit-HepTh.txt.gz", "calculation_executors_per_worker" -> "4"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_26_of_29",
+        "Job_3_26_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/email-EuAll.txt.gz", "calculation_executors_per_worker" -> "1"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_27_of_29",
+        "Job_3_27_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/email-EuAll.txt.gz", "calculation_executors_per_worker" -> "2"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_28_of_29",
+        "Job_3_28_of_29"
+      )
+      , new JobDefinition(
+        setup ++ Map("graph_url" -> "http://snap.stanford.edu/data/email-EuAll.txt.gz", "calculation_executors_per_worker" -> "4"),
+        RandomPartitionsCalculation(250),
+        VertexBMatrixCalculation,
+        "Job_3_29_of_29",
+        "Job_3_29_of_29"
+      )
     )
   }
 

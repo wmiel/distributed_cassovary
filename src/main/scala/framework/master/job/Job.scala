@@ -52,6 +52,10 @@ class Job(masterRef: ActorRef,
     name = jobDefinition.getJobName + "Logger"
   )
 
+  def logProgress = {
+    jobLogger ! Info(s"Progress: ${workPool.workDone}/${workPool.workSize}")
+  }
+
   def receive = {
     case AddWorker(worker) =>
       if (!workers.contains(worker)) {

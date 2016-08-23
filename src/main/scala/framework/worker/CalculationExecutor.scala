@@ -27,7 +27,7 @@ class CalculationExecutor(val jobRef: ActorRef, val graph: DirectedGraph[Node]) 
           val result = CalculationResult(calculation.calculate(graph, input))
           val endTime = System.nanoTime()
 
-          println("Task finished")
+          println(s"Task finished $partitionId")
           jobRef ! TaskFinishedInfo(partitionId, endTime - startTime)
           resultHandler ! result
       }

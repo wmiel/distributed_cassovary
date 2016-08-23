@@ -5,6 +5,7 @@ import java.io.File
 import com.twitter.cassovary.graph.StoredGraphDir.StoredGraphDir
 import com.twitter.cassovary.graph._
 import com.twitter.cassovary.util.io.{AdjacencyListGraphReader, GraphReaderFromDirectory, ListOfEdgesGraphReader}
+import graphTransformations.MaxIdBugWorkaround
 
 import scala.io.Source
 import scala.util.matching.Regex
@@ -74,9 +75,10 @@ trait GraphLoader {
       ListOfEdgesGraphReader.forIntIds(
         path,
         filename,
-        graphDir = graphDir,
+        removeDuplicates = removeDuplicates,
+        sortNeighbors = false,
         separator = sep,
-        removeDuplicates = removeDuplicates
+        graphDir = graphDir
       )
     }
   }
@@ -85,7 +87,7 @@ trait GraphLoader {
                                        autoSeparator: Boolean = false,
                                        graphDir: StoredGraphDir = StoredGraphDir.BothInOut): DirectedGraph[Node] = {
     val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir, autoSeparator = autoSeparator)
-    rawGraph.toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
+    MaxIdBugWorkaround(rawGraph).toSharedArrayBasedDirectedGraph(forceSparseRepr = None)
   }
 
   def readGraphAsArrayBasedGraph(path: String, filename: String, adjacencyList: Boolean,
@@ -93,6 +95,6 @@ trait GraphLoader {
                                  autoSeparator: Boolean = false,
                                  neighborsSortingStrategy: NeighborsSortingStrategy = LeaveUnsorted): DirectedGraph[Node] = {
     val rawGraph = readGraph(path, filename, adjacencyList, graphDir = graphDir, autoSeparator = autoSeparator)
-    rawGraph.toArrayBasedDirectedGraph(neighborsSortingStrategy, forceSparseRepr = None)
+    MaxIdBugWorkaround(rawGraph).toArrayBasedDirectedGraph(neighborsSortingStrategy, forceSparseRepr = None)
   }
 }

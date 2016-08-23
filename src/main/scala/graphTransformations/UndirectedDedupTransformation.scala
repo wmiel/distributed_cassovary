@@ -8,7 +8,8 @@ object UndirectedDedupTransformation {
 
     val nodesWithEdges = inputGraph.map { node: Node =>
       val outboundNodes = node.inboundNodes ++ node.outboundNodes
-      NodeIdEdgesMaxId(node.id, outboundNodes.sorted.distinct.toArray)
+      val nodes = outboundNodes.sorted.distinct.toArray
+      NodeIdEdgesMaxId(node.id, nodes, node.id.max(nodes.last))
     }
     ArrayBasedDirectedGraph(
       nodesWithEdges,

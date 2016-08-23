@@ -2,12 +2,13 @@ package calculations
 
 import algorithms.BreadthFirstTraverser
 import com.twitter.cassovary.graph._
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 trait DistanceBasedCalculation {
-  def bfs(graph: DirectedGraph[Node], input: AbstractInput): Seq[Iterator[(Int, Int)]] = input match {
+  def bfs(graph: DirectedGraph[Node], input: AbstractInput): Seq[BreadthFirstTraverser] = input match {
     case VertexInput(vertices) =>
       vertices.map(vertex => new BreadthFirstTraverser(graph, vertex))
   }
@@ -88,18 +89,19 @@ case object VertexBMatrixCalculation extends AbstractCalculation with DistanceBa
 
 case object EdgeBMatrixCalculation extends AbstractCalculation with DistanceBasedCalculation {
   override def calculate(graph: DirectedGraph[Node], input: AbstractInput): EdgeBMatrix = {
-    val distanceMaps: Seq[Map[Int, Int]] =
-      bfs(graph, input).map { distancesForVertex: Iterator[(Int, Int)] => distancesForVertex.toMap }
+    val distanceMaps: Seq[Int2IntOpenHashMap] =
+      bfs(graph, input).map { traverser: BreadthFirstTraverser => traverser.notVisitedAsMap }
 
     val distanceFrequenciesPerVertex: Seq[mutable.HashMap[Int, Int]] =
       distanceMaps.map { _ => mutable.HashMap[Int, Int]() }
 
+    val distancesCombinedWithResults = distanceMaps.zip(distanceFrequenciesPerVertex)
     graph.foreach { node: Node =>
       val nodeId = node.id
       node.outboundNodes().foreach { neighborId: Int =>
-        distanceMaps.zip(distanceFrequenciesPerVertex).foreach { case (distances, results) =>
-          val nodeDistance = distances.getOrElse(nodeId, -1)
-          val neighborDistance = distances.getOrElse(neighborId, -1)
+        distancesCombinedWithResults.foreach { case (distances, results) =>
+          val nodeDistance = distances.getOrDefault(nodeId, -1)
+          val neighborDistance = distances.getOrDefault(neighborId, -1)
 
           if (nodeDistance >= 0 && neighborDistance >= 0) {
             val distance = nodeDistance + neighborDistance
