@@ -46,11 +46,11 @@ class Master(jobDefinitions: Iterator[JobDefinition]) extends Actor {
   }
 
   def runNextJobOrExit() = {
+    println("Run next job or exit.")
     if (jobDefinitions.hasNext) {
       val currentJobDefinition = jobDefinitions.next
       currentJob = Some(
         context.actorOf(
-          //        self.startLink(
           Props(new Job(self, workers, currentJobDefinition)),
           name = currentJobDefinition.getJobName
         )

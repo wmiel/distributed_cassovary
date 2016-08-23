@@ -32,6 +32,7 @@ class ResultsHandler(jobRef: ActorRef, outputNamePrefix: String) extends Actor {
     case SaveOutput =>
       println("SAVING OUTPUT")
       saveOutputs
+      println("Saved")
       sender ! "DONE"
   }
 
@@ -47,7 +48,9 @@ class ResultsHandler(jobRef: ActorRef, outputNamePrefix: String) extends Actor {
         case Some(perVertexValues) => new PerVertexWriter(perVertexValues, outputNamePrefix, perVertexValues.getClass.getSimpleName).save
         case None =>
       }
-
     }
+    resultVertexBMatrix = None
+    resultEdgeBMatrix = None
+    perVertexOutgoingDegrees = None
   }
 }

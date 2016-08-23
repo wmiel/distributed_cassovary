@@ -63,8 +63,8 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
             graph
           )
         ).
-        //withDispatcher("akka.actor.my-thread-pool-dispatcher")
-          withDispatcher("akka.actor.my-dispatcher")
+        withDispatcher("akka.actor.my-thread-pool-dispatcher")
+        //withDispatcher("akka.actor.my-dispatcher")
 
       )
       calculationActors += calculationActor
@@ -86,6 +86,8 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
   }
 
   def setup(workerSetup: Map[String, String], jobRef: ActorRef) = {
+    println("Setup started.")
+
     val separatorSetting = workerSetup.getOrElse("file_separator", " ")
     var autoSeparator = false
     if (separatorSetting == "auto") {
@@ -125,5 +127,7 @@ class Worker(val masterPath: String) extends Actor with GzipGraphDownloader with
     stopExecutors
     val numberOfExecutors = workerSetup.getOrElse("calculation_executors_per_worker", "1").toInt
     spawnExecutors(numberOfExecutors, jobRef)
+
+    println("Setup finished.")
   }
 }

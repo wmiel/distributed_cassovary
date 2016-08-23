@@ -117,6 +117,7 @@ class Job(masterRef: ActorRef,
   }
 
   def notifyMaster = {
+    println("Notify master")
     implicit val timeout = Timeout(10 minutes)
     val outputWriteFuture = resultsHandler ? SaveOutput
     val outputWriteResponse = Await.result(outputWriteFuture, timeout.duration).asInstanceOf[String]

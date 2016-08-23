@@ -40,6 +40,8 @@ class UndirectedDedupTransformationSpec extends FunSpec with Matchers {
 
         assert(inboundNodes(graph, 6) == List(5))
         assert(outboundNodes(graph, 6) == List(5))
+
+        assert(graph.edgeCount == 2 * TestGraph.lineGraph.edgeCount)
       }
     }
 
@@ -79,6 +81,8 @@ class UndirectedDedupTransformationSpec extends FunSpec with Matchers {
 
         assert(inboundNodes(graph, 55) == List(5))
         assert(outboundNodes(graph, 55) == List(5))
+
+        assert(graph.edgeCount == 2 * TestGraph.starGraph.edgeCount)
       }
     }
 
